@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const type_move = new mongoose.Schema(
   {
-    description: {
+    title: {
       type: String,
       required: true,
     },

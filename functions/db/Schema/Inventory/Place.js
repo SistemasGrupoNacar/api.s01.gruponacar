@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const mesh_house = new mongoose.Schema(
+const place = new mongoose.Schema(
   {
     description: {
       type: String,
@@ -19,4 +19,4 @@ const mesh_house = new mongoose.Schema(
   }
 );
 
-module.exports = MeshHouse = mongoose.model("mesh_house", mesh_house);
+module.exports = Place = mongoose.model("place", place);

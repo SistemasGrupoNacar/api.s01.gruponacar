@@ -9,8 +9,8 @@ const Production = require("../../db/Schema/Inventory/Production");
 route.get("/", async (req, res) => {
   let productionCost = await ProductionCost.find()
     .sort({ _id: 1 })
-    .populate("production_product")
-    .populate("production");
+    .populate("production_product", { name: 1 })
+    .populate("production", { _id: 1 });
   res.status(200).json(productionCost);
 });
 
@@ -22,6 +22,7 @@ route.post(
   body("production_product")
     .notEmpty()
     .withMessage("El producto no debe estar vacio"),
+  body("description").exists(),
   body("quantity").notEmpty().withMessage("La cantidad no debe estar vacia"),
   body("quantity").isInt().withMessage("La cantidad debe ser un numero entero"),
   body("date").notEmpty().withMessage("La fecha no debe estar vacia"),
@@ -36,22 +37,31 @@ route.post(
   body("total").isNumeric().withMessage("El total debe ser numerico"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
-    const { production, production_product, quantity, date, unit_price, total } = req.body;
-    let productionCost = new ProductionCost({
+    const {
       production,
       production_product,
       quantity,
+      description,
       date,
       unit_price,
-      total
-      });
-    let responseProductionCost = await productionCost.save();
+      total,
+    } = req.body;
+    let productionCost = new ProductionCost({
+      production,
+      production_product,
+      description,
+      quantity,
+      date,
+      unit_price,
+      total,
+    });
+    let response = await productionCost.save();
     await Production.findByIdAndUpdate(
       production,
-      { $push: { production_costs: responseProductionCost._id } },
+      { $push: { production_costs: response._id } },
       { new: true }
     );
-    res.status(200).json(responseProductionCost);
+    res.status(201).json(response);
   }
 );
 

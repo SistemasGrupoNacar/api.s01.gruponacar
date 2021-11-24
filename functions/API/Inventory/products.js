@@ -30,7 +30,7 @@ route.post(
     product.status = status;
     let productModel = new Product(product);
     let response = await productModel.save();
-    return res.status(200).json(response);
+    return res.status(201).json(response);
   }
 );
 module.exports = route;

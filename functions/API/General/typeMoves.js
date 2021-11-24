@@ -11,36 +11,36 @@ route.get("/", async (req, res) => {
 
 route.post(
   "/",
-  body("description")
+  body("title")
     .notEmpty()
-    .withMessage("La descripcion no debe estar vacio"),
+    .withMessage("El titulo no debe estar vacio"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
-    const { description } = req.body;
+    const { title } = req.body;
     let typeMove = {};
-    typeMove.description = description;
+    typeMove.title = title;
     let typeMoveModel = new TypeMove(typeMove);
     let response = await typeMoveModel.save();
-    return res.status(200).json(response);
+    return res.status(201).json(response);
   }
 );
 
 route.put(
   "/:id",
-  body("description")
+  body("title")
     .notEmpty()
-    .withMessage("La descripcion no debe estar vacio"),
+    .withMessage("El titulo no debe estar vacio"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
     const { id } = req.params;
-    const { description } = req.body;
+    const { title } = req.body;
     let typeMove = await TypeMove.findById(id);
     if (!typeMove) {
       return res.status(404).json({
         message: "No se encontro el tipo de movimiento",
       });
     }
-    typeMove.description = description;
+    typeMove.title = title;
     let response = await typeMove.save();
     return res.status(200).json(response);
   }

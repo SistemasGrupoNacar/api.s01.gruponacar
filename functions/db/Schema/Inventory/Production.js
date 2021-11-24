@@ -12,9 +12,10 @@ const production = new mongoose.Schema(
     description: {
       type: String,
     },
-    mesh_house: {
+    place: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "mesh_house",
+      ref: "place",
+      required: true,
     },
 
     product: {

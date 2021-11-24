@@ -12,17 +12,15 @@ route.get("/", async (req, res) => {
 
 route.post(
   "/",
-  body("description")
-    .notEmpty()
-    .withMessage("La descripcion no debe estar vacio"),
+  body("title").notEmpty().withMessage("El titulo no debe estar vacio"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
-    const { description } = req.body;
-    let status = {};
-    status.description = description;
-    let statusModel = new Status(status);
+    const { title } = req.body;
+    let statusModel = new Status({
+      title,
+    });
     let response = await statusModel.save();
-    return res.status(200).json(response);
+    return res.status(201).json(response);
   }
 );
 
@@ -30,7 +28,7 @@ route.put(
   "/:id",
   body("description")
     .notEmpty()
-    .withMessage("La descripcion no debe estar vacio"),
+    .withMessage("El titulo no debe estar vacio"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
     const { id } = req.params;

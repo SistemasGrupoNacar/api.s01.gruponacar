@@ -16,5 +16,6 @@ app.use("/typeMoves", require("./API/General/typeMoves"));
 app.use("/productionCosts", require("./API/Inventory/productionCosts"));
 app.use("/productions", require("./API/Inventory/productions"));
 app.use("/productionProducts",require("./API/Inventory/productionProducts"));
+app.use("/places", require("./API/Inventory/places"));
 
 exports.api = functions.https.onRequest(app);
