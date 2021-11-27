@@ -6,18 +6,20 @@ const { body } = require("express-validator");
 const Status = require("../../db/Schema/General/Status");
 
 route.get("/", async (req, res) => {
-  let status = await Status.find().sort({ _id: 1 });
+  let status = await Status.find().sort({ _id: 1 }).populate("sector",{title:1,_id:0});
   res.status(200).json(status);
 });
 
 route.post(
   "/",
   body("title").notEmpty().withMessage("El titulo no debe estar vacio"),
+  body("sector").notEmpty().withMessage("El sector no debe estar vacio"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
-    const { title } = req.body;
+    const { title, sector } = req.body;
     let statusModel = new Status({
       title,
+      sector,
     });
     let response = await statusModel.save();
     return res.status(201).json(response);
@@ -26,9 +28,7 @@ route.post(
 
 route.put(
   "/:id",
-  body("description")
-    .notEmpty()
-    .withMessage("El titulo no debe estar vacio"),
+  body("description").notEmpty().withMessage("El titulo no debe estar vacio"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
     const { id } = req.params;

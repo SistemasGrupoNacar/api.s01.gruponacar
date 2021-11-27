@@ -13,6 +13,7 @@ app.use(cors({ origin: true }));
 app.use("/products", require("./API/Inventory/products"));
 app.use("/status", require("./API/General/status"));
 app.use("/typeMoves", require("./API/General/typeMoves"));
+app.use("/sectors", require("./API/General/sectors"));
 app.use("/productionCosts", require("./API/Inventory/productionCosts"));
 app.use("/productions", require("./API/Inventory/productions"));
 app.use("/productionProducts",require("./API/Inventory/productionProducts"));

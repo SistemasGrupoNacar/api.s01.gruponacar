@@ -6,6 +6,11 @@ const status = new mongoose.Schema(
       type: String,
       required: true,
     },
+    sector: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "sector",
+      required: true,
+    },
   },
   {
     timestamps: true,

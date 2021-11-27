@@ -20,6 +20,10 @@ const extra_moves = new mongoose.Schema(
       ref: "status",
       required: true,
     },
+    production: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "production",
+    },
     total: {
       type: Number,
       required: true,

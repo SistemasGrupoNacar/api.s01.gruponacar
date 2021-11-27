@@ -5,6 +5,7 @@ const Place = require("../../db/Schema/Inventory/Place");
 const { body } = require("express-validator");
 const errors = require("../../errors/index");
 
+
 route.get("/", async (req, res) => {
   let places = await Place.find()
     .sort({ _id: 1 })

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { type } = require("os");
 
 const production = new mongoose.Schema(
   {
@@ -8,9 +9,11 @@ const production = new mongoose.Schema(
     },
     end_date: {
       type: Date,
+      default: null,
     },
     description: {
       type: String,
+      default: "",
     },
     place: {
       type: mongoose.Schema.Types.ObjectId,
@@ -35,11 +38,25 @@ const production = new mongoose.Schema(
         ref: "production_cost",
       },
     ],
-    total_sales: {
+    salaries: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "salaries",
+      },
+    ],extra_moves: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "extra_moves",
+      },
+    ],
+
+    total_ingress: {
       type: Number,
+      default: 0,
     },
-    total_production_costs: {
+    total_egress: {
       type: Number,
+      default: 0,
     },
     status: {
       type: mongoose.Schema.Types.ObjectId,
