@@ -18,5 +18,7 @@ app.use("/productionCosts", require("./API/Inventory/productionCosts"));
 app.use("/productions", require("./API/Inventory/productions"));
 app.use("/productionProducts", require("./API/Inventory/productionProducts"));
 app.use("/places", require("./API/Inventory/places"));
+app.use("/login", require("./API/General/login"));
+app.use("/users", require("./API/General/users"));
 
 exports.api = functions.https.onRequest(app);
