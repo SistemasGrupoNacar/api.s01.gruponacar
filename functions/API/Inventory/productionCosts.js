@@ -3,8 +3,8 @@ const route = express.Router();
 const mongoose = require("mongoose");
 const { body } = require("express-validator");
 const errors = require("../../errors/index");
-const ProductionCost = require("../../db/Schema/Inventory/ProductionCost");
-const Production = require("../../db/Schema/Inventory/Production");
+const ProductionCost = require("../../db/Models/Inventory/ProductionCost");
+const Production = require("../../db/Models/Inventory/Production");
 
 route.get("/", async (req, res) => {
   let productionCost = await ProductionCost.find()
@@ -64,5 +64,16 @@ route.post(
     res.status(201).json(response);
   }
 );
+
+route.delete("/:id", async (req, res) => {
+  const response = await ProductionCost.findByIdAndDelete(req.params.id);
+  const production = await Production.findById(response.production);
+  await Production.findByIdAndUpdate(
+    production,
+    { $pull: { production_costs: response._id } },
+    { new: true }
+  );
+  res.status(200).json(response);
+});
 
 module.exports = route;

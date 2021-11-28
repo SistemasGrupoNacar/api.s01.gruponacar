@@ -1,15 +1,12 @@
 const express = require("express");
 const route = express.Router();
 const mongoose = require("mongoose");
-const Place = require("../../db/Schema/Inventory/Place");
+const Place = require("../../db/Models/Inventory/Place");
 const { body } = require("express-validator");
 const errors = require("../../errors/index");
 
-
 route.get("/", async (req, res) => {
-  let places = await Place.find()
-    .sort({ _id: 1 })
-    .populate("status", { title: 1, _id: 0 });
+  let places = await Place.find().sort({ _id: 1 });
   res.status(200).json(places);
 });
 
@@ -18,25 +15,30 @@ route.post(
   body("description")
     .notEmpty()
     .withMessage("La descripcion no debe estar vacia"),
-  body("status").notEmpty().withMessage("El estado no debe estar vacio"),
+  body("availability")
+    .isBoolean()
+    .withMessage("La disponibilidad debe ser booleano"),
+  body("availability")
+    .notEmpty()
+    .withMessage("La disponibilidad no debe estar vacia"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
-    const { description, status } = req.body;
+    const { description, availability } = req.body;
     const place = new Place({
       description,
-      status,
+      availability,
     });
     const response = await place.save();
     res.status(201).json(response);
   }
 );
 
-route.put("/:id/:status", async (req, res) => {
+route.put("/:id/:availability", async (req, res) => {
   errors.validationErrorResponse(req, res);
   const response = await Place.findByIdAndUpdate(
     req.params.id,
     {
-      status: req.params.status,
+      availability: req.params.availability,
     },
     { new: true }
   );

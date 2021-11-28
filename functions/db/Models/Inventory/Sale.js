@@ -4,7 +4,7 @@ const sale = new mongoose.Schema(
   {
     production_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "production",
+      ref: "Production",
       required: true,
     },
     date: {
@@ -12,8 +12,7 @@ const sale = new mongoose.Schema(
       required: true,
     },
     status: {
-      type: mongooes.Schema.Types.ObjectId,
-      ref: "status",
+      type: Boolean,
       required: true,
     },
     description: {
@@ -22,7 +21,7 @@ const sale = new mongoose.Schema(
     detail_sale: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "detail_sale",
+        ref: "DetailSale",
       },
     ],
     total: {
@@ -34,4 +33,4 @@ const sale = new mongoose.Schema(
   }
 );
 
-module.exports = Sale = mongoose.model("sale", sale);
+module.exports = Sale = mongoose.model("Sale", sale);

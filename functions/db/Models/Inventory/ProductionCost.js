@@ -1,15 +1,15 @@
 const mongoose = require("mongoose");
 
-const production_cost = new mongoose.Schema(
+const productionCost = new mongoose.Schema(
   {
     production: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "production",
+      ref: "Production",
       required: true,
     },
     production_product: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "production_product",
+      ref: "ProductionProduct",
       required: true,
     },
     description: {
@@ -38,6 +38,6 @@ const production_cost = new mongoose.Schema(
 );
 
 module.exports = ProductionCost = mongoose.model(
-  "production_cost",
-  production_cost
+  "ProductionCost",
+  productionCost
 );

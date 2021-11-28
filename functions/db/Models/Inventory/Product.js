@@ -13,15 +13,14 @@ const product = new mongoose.Schema(
     description: {
       type: String,
     },
-    status: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "status",
+    availability: {
+      type: Boolean,
       required: true,
-    },
+    }
   },
   {
     timestamps: true,
   }
 );
 
-module.exports = Product = mongoose.model("product", product);
+module.exports = Product = mongoose.model("Product", product);

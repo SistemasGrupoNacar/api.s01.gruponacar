@@ -17,36 +17,43 @@ const production = new mongoose.Schema(
     },
     place: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "place",
+      ref: "Place",
       required: true,
     },
 
     product: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "product",
+      ref: "Product",
       required: true,
     },
     sales: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "sales",
+        ref: "Sale",
       },
     ],
     production_costs: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "production_cost",
+        ref: "ProductionCost",
       },
     ],
     salaries: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "salaries",
+        ref: "Salary",
       },
-    ],extra_moves: [
+    ],
+    extra_moves: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "extra_moves",
+        ref: "ExtraMoves",
+      },
+    ],
+    harvest: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Harvest",
       },
     ],
 
@@ -58,9 +65,8 @@ const production = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    status: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "status",
+    in_progress: {
+      type: Boolean,
       required: true,
     },
   },
@@ -69,4 +75,4 @@ const production = new mongoose.Schema(
   }
 );
 
-module.exports = Production = mongoose.model("production", production);
+module.exports = Production = mongoose.model("Production", production);

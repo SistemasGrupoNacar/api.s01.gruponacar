@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const extra_moves = new mongoose.Schema(
+const extraMove = new mongoose.Schema(
   {
     description: {
       type: String,
@@ -12,17 +12,12 @@ const extra_moves = new mongoose.Schema(
     },
     type_move: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "type_move",
-      required: true,
-    },
-    status: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "status",
+      ref: "TypeMove",
       required: true,
     },
     production: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "production",
+      ref: "Production",
     },
     total: {
       type: Number,
@@ -34,4 +29,4 @@ const extra_moves = new mongoose.Schema(
   }
 );
 
-module.exports = ExtraMoves = mongoose.model("extra_moves", extra_moves);
+module.exports = ExtraMove = mongoose.model("ExtraMove", extraMove);

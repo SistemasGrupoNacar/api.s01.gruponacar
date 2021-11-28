@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const production_product = new mongoose.Schema(
+const productionProduct = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -21,11 +21,10 @@ const production_product = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    status: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "status",
+    availability: {
+      type: Boolean,
       required: true,
-    },
+    }
   },
   {
     timestamps: true,
@@ -33,6 +32,6 @@ const production_product = new mongoose.Schema(
 );
 
 module.exports = ProductionProduct = mongoose.model(
-  "production_product",
-  production_product
+  "ProductionProduct",
+  productionProduct
 );

@@ -2,7 +2,7 @@ const express = require("express");
 const route = express.Router();
 const errors = require("../../errors/index");
 const { body } = require("express-validator");
-const TypeMove = require("../../db/Schema/General/TypeMove");
+const TypeMove = require("../../db/Models/General/TypeMove");
 
 route.get("/", async (req, res) => {
   let typeMove = await TypeMove.find().sort({ _id: 1 });
@@ -11,15 +11,13 @@ route.get("/", async (req, res) => {
 
 route.post(
   "/",
-  body("title")
-    .notEmpty()
-    .withMessage("El titulo no debe estar vacio"),
+  body("title").notEmpty().withMessage("El titulo no debe estar vacio"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
     const { title } = req.body;
-    let typeMove = {};
-    typeMove.title = title;
-    let typeMoveModel = new TypeMove(typeMove);
+    let typeMoveModel = new TypeMove({
+      title,
+    });
     let response = await typeMoveModel.save();
     return res.status(201).json(response);
   }
@@ -27,9 +25,7 @@ route.post(
 
 route.put(
   "/:id",
-  body("title")
-    .notEmpty()
-    .withMessage("El titulo no debe estar vacio"),
+  body("title").notEmpty().withMessage("El titulo no debe estar vacio"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
     const { id } = req.params;

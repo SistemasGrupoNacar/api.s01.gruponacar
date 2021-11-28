@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const sector = new mongoose.Schema(
+const typeMove = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -12,4 +12,4 @@ const sector = new mongoose.Schema(
   }
 );
 
-module.exports = Sector = mongoose.model("sector", sector);
+module.exports = TypeMove = mongoose.model("TypeMove", typeMove);
