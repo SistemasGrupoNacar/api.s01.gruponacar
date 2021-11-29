@@ -1,6 +1,6 @@
 const express = require("express");
 const route = express.Router();
-const errors = require("../../errors/index");
+const {errors} = require("../../middleware/errors");
 const { getState } = require("../../db/db-status");
 const { body } = require("express-validator");
 const Product = require("../../db/Models/Inventory/Product");

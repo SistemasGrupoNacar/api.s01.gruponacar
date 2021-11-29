@@ -1,9 +1,8 @@
 const express = require("express");
 const route = express.Router();
-const mongoose = require("mongoose");
 const Place = require("../../db/Models/Inventory/Place");
 const { body } = require("express-validator");
-const errors = require("../../errors/index");
+const {errors} = require("../../middleware/errors");
 
 route.get("/", async (req, res) => {
   let places = await Place.find().sort({ _id: 1 });

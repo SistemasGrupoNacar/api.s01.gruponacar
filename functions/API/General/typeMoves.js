@@ -1,9 +1,9 @@
 const express = require("express");
 const route = express.Router();
-const errors = require("../../errors/index");
+const {errors} = require("../../middleware/errors");
 const { body } = require("express-validator");
 const TypeMove = require("../../db/Models/General/TypeMove");
-let { authenticateToken } = require("../../middleware/token");
+let { authenticateToken } = require("../../middleware/auth");
 
 route.get("/", authenticateToken, async (req, res) => {
   let typeMove = await TypeMove.find().sort({ _id: 1 });

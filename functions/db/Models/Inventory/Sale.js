@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const sale = new mongoose.Schema(
   {
-    production_id: {
+    production: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Production",
       required: true,

@@ -1,8 +1,7 @@
 const express = require("express");
 const route = express.Router();
-const mongoose = require("mongoose");
 const { body } = require("express-validator");
-const errors = require("../../errors/index");
+const { errors } = require("../../middleware/errors");
 const Production = require("../../db/Models/Inventory/Production");
 
 route.get("/", async (req, res) => {
@@ -20,6 +19,67 @@ route.get("/", async (req, res) => {
       status: 1,
     });
   res.status(200).json(productions);
+});
+
+//get production start between two dates
+route.get("/start/:startDate/:endDate", async (req, res) => {
+  try {
+    let productions = await Production.find({
+      start_date: {
+        $gte: req.params.startDate,
+        $lte: req.params.endDate,
+      },
+    })
+      .sort({ _id: 1 })
+      .populate("place", { description: 1, _id: 0 })
+      .populate("product", { name: 1, _id: 0 })
+      //.populate("sales")
+      .populate("production_costs", {
+        description: 1,
+        date: 1,
+        quantity: 1,
+        total: 1,
+        unit_price: 1,
+        status: 1,
+      });
+    res.status(200).json(productions);
+  } catch (error) {
+    res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
+
+//get production finished between two dates
+route.get("/end/:startDate/:endDate", async (req, res) => {
+  try {
+    let productions = await Production.find({
+      end_date: {
+        $gte: req.params.startDate,
+        $lte: req.params.endDate,
+        $ne: null,
+      },
+    })
+      .sort({ _id: 1 })
+      .populate("place", { description: 1, _id: 0 })
+      .populate("product", { name: 1, _id: 0 })
+      //.populate("sales")
+      .populate("production_costs", {
+        description: 1,
+        date: 1,
+        quantity: 1,
+        total: 1,
+        unit_price: 1,
+        status: 1,
+      });
+    res.status(200).json(productions);
+  } catch (error) {
+    res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
 });
 
 route.post(
@@ -49,12 +109,9 @@ route.post(
   }
 );
 
-route.delete(
-  "/:id",
-  async (req, res) => {
-    const response = await Production.findByIdAndDelete(req.params.id);
-    res.status(200).json(response);
-  }
-);
+route.delete("/:id", async (req, res) => {
+  const response = await Production.findByIdAndDelete(req.params.id);
+  res.status(200).json(response);
+});
 
 module.exports = route;

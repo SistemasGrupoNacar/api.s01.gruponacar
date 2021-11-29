@@ -10,4 +10,4 @@ const errors = {
 }
 
 
-module.exports = errors;
+module.exports = {errors};

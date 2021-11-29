@@ -2,7 +2,7 @@ const express = require("express");
 const route = express.Router();
 const mongoose = require("mongoose");
 const { body } = require("express-validator");
-const errors = require("../../errors/index");
+const {errors} = require("../../middleware/errors");
 const ProductionProduct = require("../../db/Models/Inventory/ProductionProduct");
 
 route.get("/", async (req, res) => {

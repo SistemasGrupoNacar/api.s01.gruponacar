@@ -7,7 +7,7 @@
 */
 
 const jwt = require("jsonwebtoken");
-const { SECRET_TOKEN, TIME_TOKEN } = require("./config");
+const { SECRET_TOKEN, TIME_TOKEN } = require("./auth.config");
 
 function setToken(data) {
   let token = jwt.sign(data, SECRET_TOKEN, {

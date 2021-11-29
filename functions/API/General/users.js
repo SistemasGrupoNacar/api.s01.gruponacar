@@ -1,6 +1,6 @@
 const express = require("express");
 const route = express.Router();
-const errors = require("../../errors/index");
+const { errors } = require("../../middleware/errors");
 const User = require("../../db/Models/General/User");
 const { body } = require("express-validator");
 const { createHmac } = require("../../scripts/encrypt");

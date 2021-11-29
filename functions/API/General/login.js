@@ -1,10 +1,10 @@
 const express = require("express");
 const route = express.Router();
-const errors = require("../../errors/index");
+const {errors} = require("../../middleware/errors");
 const User = require("../../db/Models/General/User");
 const { body } = require("express-validator");
 const { compareHmac } = require("../../scripts/encrypt");
-const { setToken } = require("../../middleware/token");
+const { setToken } = require("../../middleware/auth");
 
 route.post(
   "/",
