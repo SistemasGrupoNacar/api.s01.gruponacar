@@ -47,7 +47,7 @@ const production = new mongoose.Schema(
     extra_moves: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "ExtraMoves",
+        ref: "ExtraMove",
       },
     ],
     harvest: [

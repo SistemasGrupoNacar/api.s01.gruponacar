@@ -12,9 +12,9 @@ route.get("/", async (req, res) => {
       .sort({ _id: 1 })
       .populate("production_product", { name: 1 })
       .populate("production", { _id: 1 });
-    res.status(200).json(productionCost);
+      return res.status(200).json(productionCost);
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       name: err.name,
       message: err.message,
     });
@@ -43,9 +43,9 @@ route.get(
         .sort({ _id: 1 })
         .populate("production_product", { name: 1 })
         .populate("production", { _id: 1 });
-      res.status(200).json(productionCost);
+        return res.status(200).json(productionCost);
     } catch (err) {
-      res.status(500).json({
+      return res.status(500).json({
         name: err.name,
         error: err.message,
       });
@@ -101,9 +101,9 @@ route.post(
         { $push: { production_costs: response._id } },
         { new: true }
       );
-      res.status(201).json(response);
+      return res.status(201).json(response);
     } catch (err) {
-      res.status(500).json({
+      return res.status(500).json({
         name: err.name,
         error: err.message,
       });
@@ -120,9 +120,9 @@ route.delete("/:id", async (req, res) => {
       { $pull: { production_costs: response._id } },
       { new: true }
     );
-    res.status(200).json(response);
+    return res.status(200).json(response);
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       name: err.name,
       error: err.message,
     });

@@ -6,7 +6,7 @@ const {errors} = require("../../middleware/errors");
 
 route.get("/", async (req, res) => {
   let places = await Place.find().sort({ _id: 1 });
-  res.status(200).json(places);
+  return res.status(200).json(places);
 });
 
 route.post(
@@ -28,7 +28,7 @@ route.post(
       availability,
     });
     const response = await place.save();
-    res.status(201).json(response);
+    return res.status(201).json(response);
   }
 );
 
@@ -41,7 +41,7 @@ route.put("/:id/:availability", async (req, res) => {
     },
     { new: true }
   );
-  res.status(200).json(response);
+  return res.status(200).json(response);
 });
 
 route.put("/:id", async (req, res) => {
@@ -54,11 +54,11 @@ route.put("/:id", async (req, res) => {
     },
     { new: true }
   );
-  res.status(200).json(response);
+  return res.status(200).json(response);
 });
 
 route.delete("/:id", async (req, res) => {
   const response = await Place.findByIdAndDelete(req.params.id);
-  res.status(200).json(response);
+  return res.status(200).json(response);
 });
 module.exports = route;

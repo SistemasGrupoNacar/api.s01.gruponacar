@@ -3,6 +3,7 @@ const route = express.Router();
 const { body, param } = require("express-validator");
 const { errors } = require("../../middleware/errors");
 const Sale = require("../../db/Models/Inventory/Sale");
+const Production = require("../../db/Models/Inventory/Production");
 
 route.get("/", async (req, res) => {
   try {
@@ -14,10 +15,9 @@ route.get("/", async (req, res) => {
         populate: { path: "product", select: "name" },
         select: "quantity sub_total total",
       });
-    res.status(200).json(sale);
-    x;
+    return res.status(200).json(sale);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       name: error.name,
       message: error.message,
     });
@@ -32,6 +32,14 @@ route.post(
   async (req, res) => {
     errors.validationErrorResponse(req, res);
     const { production, date, description } = req.body;
+
+    //verifica si existe la produccion
+    const production_exist = await Production.findById(production);
+    if (!production_exist) {
+      return res.status(400).json({
+        message: "La producción no existe",
+      });
+    }
     const sale = new Sale({
       production,
       description,
@@ -40,9 +48,13 @@ route.post(
     });
     try {
       const response = await sale.save();
-      res.status(201).json(response);
+      //agregar la venta a produccion
+      await Production.findByIdAndUpdate(production, {
+        $push: { sales: response._id },
+      });
+      return res.status(201).json(response);
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         name: error.name,
         message: error.message,
       });
@@ -62,14 +74,33 @@ route.put(
         { status },
         { new: true }
       );
-      res.status(200).json(response);
+      return res.status(200).json(response);
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         name: error.name,
         message: error.message,
       });
     }
   }
 );
+
+route.delete("/:id", async (req, res) => {
+  try {
+    const sale = await Sale.findById(req.params.id);
+    //eliminar cada detail_sale
+    if (sale.detail_sale.length > 0) {
+      for (let i = 0; i < sale.detail_sale.length; i++) {
+        await DetailSale.findByIdAndDelete(sale.detail_sale[i]);
+      }
+    }
+    const response = await Sale.findByIdAndDelete(req.params.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
 
 module.exports = route;

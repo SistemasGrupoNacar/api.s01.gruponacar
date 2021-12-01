@@ -6,7 +6,9 @@ const { body } = require("express-validator");
 const { createHmac } = require("../../scripts/encrypt");
 
 route.get("/", async (req, res) => {
-  const users = await User.find().sort({ _id: 1 });
+  const users = await User.find()
+    .sort({ _id: 1 })
+    .populate("role", { title: 1, _id: 0 });
   res.status(200).json(users);
 });
 
@@ -16,11 +18,12 @@ route.post(
   body("password").notEmpty().withMessage("Contraseña requerida"),
   body("firstName").notEmpty().withMessage("Nombre requerido"),
   body("lastName").notEmpty().withMessage("Apellido requerido"),
-  body("phone").notEmpty().withMessage("Telefono requerido"),
   body("dui").notEmpty().withMessage("DUI requerido"),
+  body("role").notEmpty().withMessage("Rol requerido"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
-    const { firstName, lastName, phone, dui, username, password } = req.body;
+    const { firstName, lastName, phone, dui, username, password, role } =
+      req.body;
     let user = await User.findOne({ username: username });
     if (user) {
       return res.status(400).json({
@@ -35,9 +38,10 @@ route.post(
       dui,
       username,
       password: encryptPass,
+      role,
     });
     newUser.save();
-    return res.status(200).json(newUser);
+    return res.status(201).json(newUser);
   }
 );
 

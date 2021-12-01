@@ -16,7 +16,7 @@ const user = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: true,
+    default: "",
   },
   username: {
     type: String,
@@ -24,6 +24,11 @@ const user = new mongoose.Schema({
   },
   password: {
     type: String,
+    required: true,
+  },
+  role: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Role",
     required: true,
   },
 });
