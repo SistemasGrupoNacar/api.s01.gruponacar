@@ -1,5 +1,0 @@
-const SHA_ENCRYPT = process.env.SHA_ENCRYPT;
-const SECRET_ENCRYPT = process.env.SECRET_ENCRYPT;
-const DIGEST_ENCRYPT = process.env.DIGEST_ENCRYPT;
-
-module.exports = { SHA_ENCRYPT, SECRET_ENCRYPT, DIGEST_ENCRYPT };

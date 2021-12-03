@@ -1,9 +1,9 @@
 const express = require("express");
 const route = express.Router();
-const {errors} = require("../../middleware/errors");
+const { errors } = require("../../middleware/errors");
 const User = require("../../db/Models/General/User");
 const { body } = require("express-validator");
-const { compareHmac } = require("../../scripts/encrypt");
+const { comparePassword } = require("../../scripts/encrypt");
 const { setToken } = require("../../middleware/auth");
 
 route.post(
@@ -14,7 +14,7 @@ route.post(
     errors.validationErrorResponse(req, res);
     const { username, password } = req.body;
     const user = await User.findOne({ username: username });
-    if (compareHmac(password, user.password)) {
+    if (comparePassword(password, user.password)) {
       const token = setToken({
         _id: user._id,
         username: user.username,

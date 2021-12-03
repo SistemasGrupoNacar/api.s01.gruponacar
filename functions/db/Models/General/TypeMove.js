@@ -12,4 +12,11 @@ const typeMove = new mongoose.Schema(
   }
 );
 
+typeMove.methods.toJSON = function () {
+  const obj = this.toObject();
+  delete obj.createdAt;
+  delete obj.updatedAt;
+  return obj;
+};
+
 module.exports = TypeMove = mongoose.model("TypeMove", typeMove);

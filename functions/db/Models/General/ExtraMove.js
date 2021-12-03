@@ -29,4 +29,13 @@ const extraMove = new mongoose.Schema(
   }
 );
 
+//eliminar los campos que no queremos que se devuelvan en la respuesta
+extraMove.methods.toJSON = function () {
+  const obj = this.toObject();
+  delete obj.__v;
+  delete obj.createdAt;
+  delete obj.updatedAt;
+  return obj;
+};
+
 module.exports = ExtraMove = mongoose.model("ExtraMove", extraMove);

@@ -2,8 +2,9 @@ const express = require("express");
 const route = express.Router();
 const { errors } = require("../../middleware/errors");
 const User = require("../../db/Models/General/User");
+const Role = require("../../db/Models/General/Role");
 const { body } = require("express-validator");
-const { createHmac } = require("../../scripts/encrypt");
+const { createHash } = require("../../scripts/encrypt");
 
 route.get("/", async (req, res) => {
   const users = await User.find()
@@ -24,24 +25,39 @@ route.post(
     errors.validationErrorResponse(req, res);
     const { firstName, lastName, phone, dui, username, password, role } =
       req.body;
-    let user = await User.findOne({ username: username });
-    if (user) {
-      return res.status(400).json({
-        message: "El usuario ya existe",
+
+    try {
+      let user = await User.findOne({ username: username });
+      if (user) {
+        return res.status(400).json({
+          message: "El usuario ya existe",
+        });
+      }
+      //verificar si existe el rol
+      if (!(await Role.findById(role))) {
+        return res.status(400).json({
+          message: "El rol no existe",
+        });
+      }
+      //encriptar contraseña
+      const encryptPass = createHash(password);
+      const createdUser = new User({
+        firstName,
+        lastName,
+        phone,
+        dui,
+        username,
+        password: encryptPass,
+        role,
+      });
+      await createdUser.save();
+      res.status(201).json(createdUser);
+    } catch (error) {
+      res.status(500).json({
+        name: error.name,
+        message: error.message,
       });
     }
-    const encryptPass = createHmac(password);
-    const newUser = new User({
-      firstName,
-      lastName,
-      phone,
-      dui,
-      username,
-      password: encryptPass,
-      role,
-    });
-    newUser.save();
-    return res.status(201).json(newUser);
   }
 );
 
