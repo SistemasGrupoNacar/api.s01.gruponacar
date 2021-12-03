@@ -24,6 +24,42 @@ route.get("/", async (req, res) => {
   }
 });
 
+// obtener las ventas entre un rango de fechas
+route.get("/:startDate/:endDate", async (req, res) => {
+  try {
+    const { startDate, endDate } = req.params;
+    const sale = await Sale.find({
+      date: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    })
+      .sort({ _id: 1 })
+      .populate("production", { _id: 1 })
+      .populate({
+        path: "detail_sale",
+        populate: { path: "product", select: "name" },
+        select: "quantity sub_total total",
+      });
+    //count total in sales
+    const total = sale.reduce((acc, cur) => {
+      return acc + cur.total;
+    }, 0);
+
+    return res.status(200).json({
+      data: sale,
+      total,
+      startDate,
+      endDate,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
+
 route.post(
   "/",
   body("production").notEmpty().withMessage("Producción es requerida"),

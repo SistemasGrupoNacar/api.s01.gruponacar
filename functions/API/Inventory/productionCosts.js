@@ -12,7 +12,7 @@ route.get("/", async (req, res) => {
       .sort({ _id: 1 })
       .populate("production_product", { name: 1 })
       .populate("production", { _id: 1 });
-      return res.status(200).json(productionCost);
+    return res.status(200).json(productionCost);
   } catch (err) {
     return res.status(500).json({
       name: err.name,
@@ -43,7 +43,30 @@ route.get(
         .sort({ _id: 1 })
         .populate("production_product", { name: 1 })
         .populate("production", { _id: 1 });
-        return res.status(200).json(productionCost);
+      //count total productionCost
+      let totalProductionCost = await ProductionCost.aggregate([
+        {
+          $match: {
+            date: {
+              $gte: req.params.startDate,
+              $lte: req.params.endDate,
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: "$total" },
+          },
+        },
+      ]);
+
+      return res.status(200).json({
+        data: productionCost,
+        total: totalProductionCost[0].total,
+        startDate: req.params.startDate,
+        endDate: req.params.endDate,
+      });
     } catch (err) {
       return res.status(500).json({
         name: err.name,

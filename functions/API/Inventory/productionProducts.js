@@ -43,4 +43,18 @@ route.post(
   }
 );
 
+route.delete(
+  "/:id",
+  async (req, res) => {
+    let productionProduct = await ProductionProduct.findById(req.params.id);
+    if (!productionProduct) {
+      return res.status(404).json({
+        message: "El producto de produccion no existe",
+      });
+    }
+    await productionProduct.remove();
+    res.status(200).json(productionProduct);
+  }
+)
+
 module.exports = route;

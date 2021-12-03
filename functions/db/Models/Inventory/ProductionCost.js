@@ -37,6 +37,15 @@ const productionCost = new mongoose.Schema(
   }
 );
 
+//eliminacion de los campos que no queremos que se muestren en la respuesta
+productionCost.methods.toJSON = function () {
+  const obj = this.toObject();
+  delete obj.__v;
+  delete obj.createdAt;
+  delete obj.updatedAt;
+  return obj;
+};
+
 module.exports = ProductionCost = mongoose.model(
   "ProductionCost",
   productionCost

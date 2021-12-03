@@ -12,7 +12,43 @@ route.get("/", async (req, res) => {
       .sort({ _id: 1 })
       .populate("product", { _id: 1, name: 1 })
       .populate("production", { _id: 1 });
+
     return res.status(200).json(harvest);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
+
+// endpoint get harvest between two dates
+route.get("/:startDate/:endDate", async (req, res) => {
+  try {
+    const harvest = await Harvest.find({
+      date: {
+        $gte: req.params.startDate,
+        $lte: req.params.endDate,
+      },
+    })
+      .sort({ _id: 1 })
+      .populate("product", { _id: 1, name: 1 })
+      .populate("production", { _id: 1 });
+    //couunt the number of quantity in harvest
+    const count = await Harvest.aggregate([
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$quantity" },
+        },
+      },
+    ]);
+    return res.status(200).json({
+      data: harvest,
+      total: count[0].total,
+      startDate: req.params.startDate,
+      endDate: req.params.endDate,
+    });
   } catch (error) {
     return res.status(500).json({
       name: error.name,

@@ -33,4 +33,13 @@ const sale = new mongoose.Schema(
   }
 );
 
+// eliminacion de los campos innecesarios
+sale.methods.toJSON = function () {
+  const obj = this.toObject();
+  delete obj.__v;
+  delete obj.createdAt;
+  delete obj.updatedAt;
+  return obj;
+};
+
 module.exports = Sale = mongoose.model("Sale", sale);
