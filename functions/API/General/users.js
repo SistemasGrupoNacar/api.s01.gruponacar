@@ -30,12 +30,14 @@ route.post(
       let user = await User.findOne({ username: username });
       if (user) {
         return res.status(400).json({
+          name: "Usuario",
           message: "El usuario ya existe",
         });
       }
       //verificar si existe el rol
       if (!(await Role.findById(role))) {
         return res.status(400).json({
+          name: "Rol",
           message: "El rol no existe",
         });
       }
@@ -66,6 +68,7 @@ route.delete("/:id", async (req, res) => {
   const user = await User.findById(id);
   if (!user) {
     return res.status(404).json({
+      name: "Usuario",
       message: "No se encontro el usuario",
     });
   }

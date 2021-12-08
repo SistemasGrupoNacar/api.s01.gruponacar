@@ -73,6 +73,7 @@ route.post(
       const productionExist = await Production.findById(production);
       if (!productionExist) {
         return res.status(404).json({
+          name: "Produccion",
           message: "Producción no existe",
         });
       }
@@ -111,6 +112,7 @@ route.delete("/:id", async (req, res) => {
     const harvest = await Harvest.findById(req.params.id);
     if (!harvest) {
       return res.status(404).json({
+        name: "Cosecha",
         message: "No se encontró el registro",
       });
     }
@@ -118,6 +120,7 @@ route.delete("/:id", async (req, res) => {
     const product = await Product.findById(harvest.product);
     if (product.stock < harvest.quantity) {
       return res.status(400).json({
+        name: "Cosecha",
         message:
           "No se puede eliminar el registro por problemas de stock y cantidad de la cosecha",
       });

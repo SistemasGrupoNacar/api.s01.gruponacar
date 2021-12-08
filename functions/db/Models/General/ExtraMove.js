@@ -15,10 +15,6 @@ const extraMove = new mongoose.Schema(
       ref: "TypeMove",
       required: true,
     },
-    production: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Production",
-    },
     total: {
       type: Number,
       required: true,

@@ -16,7 +16,7 @@ app.use("/products", require("./API/Inventory/products"));
 app.use("/typeMoves", require("./API/General/typeMoves"));
 app.use("/productionCosts", require("./API/Inventory/productionCosts"));
 app.use("/productions", require("./API/Inventory/productions"));
-app.use("/productionProducts", require("./API/Inventory/productionProducts"));
+app.use("/inventoryProducts", require("./API/Inventory/inventoryProducts"));
 app.use("/places", require("./API/Inventory/places"));
 app.use("/login", require("./API/General/login"));
 app.use("/users", require("./API/General/users"));
@@ -24,5 +24,7 @@ app.use("/harvest", require("./API/Inventory/harvest"));
 app.use("/detailSales", require("./API/Inventory/detailSales"));
 app.use("/sales", require("./API/Inventory/sales"));
 app.use("/roles", require("./API/General/roles"));
+app.use("/extraMoves", require("./API/General/extraMoves"));
+app.use("/inventoryEntries", require("./API/Inventory/inventoryEntries"));
 
 exports.api = functions.https.onRequest(app);

@@ -6,10 +6,9 @@ const { body, param } = require("express-validator");
 const Product = require("../../db/Models/Inventory/Product");
 
 route.get("/", async (req, res) => {
-  let products =
-    await Product.find(/*{status:'619c6cdfaa41728e78071e8e'}*/).sort({
-      name: 1,
-    });
+  let products = await Product.find().sort({
+    name: 1,
+  });
   return res.status(200).json(products);
 });
 
@@ -51,7 +50,7 @@ route.put(
     let product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({
-        name: "Producto no encontrado",
+        name: "Producto",
         message: "El producto no existe",
       });
     }
@@ -73,7 +72,7 @@ route.put(
     let product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({
-        name: "Producto no encontrado",
+        name: "Producto",
         message: "El producto no existe",
       });
     }
@@ -92,9 +91,13 @@ route.put(
     errors.validationErrorResponse(req, res);
     const { id } = req.params;
     const { description } = req.body;
-    let response = await Product.findByIdAndUpdate(id, {
-      description,
-    }, { new: true });
+    let response = await Product.findByIdAndUpdate(
+      id,
+      {
+        description,
+      },
+      { new: true }
+    );
 
     return res.status(200).json(response);
   }

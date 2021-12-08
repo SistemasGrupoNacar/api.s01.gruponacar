@@ -138,12 +138,14 @@ route.put(
     //validar que exista la produccion
     if (!production) {
       return res.status(404).json({
+        name: "Produccion",
         message: "La produccion no existe",
       });
     }
     //validar que la produccion no este finalizada
     if (production.in_progress === false) {
       return res.status(400).json({
+        name: "Produccion",
         message: "La produccion ya esta finalizada",
       });
     }
@@ -151,6 +153,7 @@ route.put(
     //validar que la fecha de fin sea mayor a la fecha de inicio
     if (production.start_date > end_date) {
       return res.status(400).json({
+        name: "Produccion",
         message: "La fecha de fin debe ser mayor a la fecha de inicio",
       });
     }

@@ -14,20 +14,28 @@ route.post(
     errors.validationErrorResponse(req, res);
     const { username, password } = req.body;
     const user = await User.findOne({ username: username });
-    if (comparePassword(password, user.password)) {
-      const token = setToken({
-        _id: user._id,
-        username: user.username,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        dui: user.dui,
-        phone: user.phone,
-      });
-      return res.status(200).json(token);
+    if (user) {
+      if (comparePassword(password, user.password)) {
+        const token = setToken({
+          _id: user._id,
+          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          dui: user.dui,
+          phone: user.phone,
+        });
+        return res.status(200).json(token);
+      } else {
+        return res.status(403).json({
+          name: "Error de autenticación",
+          message: "Usuario o contraseña incorrectos",
+        });
+      }
     } else {
-      return res
-        .status(403)
-        .json({ message: "Usuario o contraseña incorrectos" });
+      return res.status(403).json({
+        name: "Error de autenticación",
+        message: "Usuario o contraseña incorrectos",
+      });
     }
   }
 );

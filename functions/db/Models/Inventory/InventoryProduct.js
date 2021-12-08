@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const productionProduct = new mongoose.Schema(
+const inventoryProduct = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -32,7 +32,7 @@ const productionProduct = new mongoose.Schema(
 );
 
 // eliminacion de los campos createdAt y updatedAt y __v
-productionProduct.methods.toJSON = function () {
+inventoryProduct.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.createdAt;
   delete obj.updatedAt;
@@ -40,7 +40,7 @@ productionProduct.methods.toJSON = function () {
   return obj;
 };
 
-module.exports = ProductionProduct = mongoose.model(
-  "ProductionProduct",
-  productionProduct
+module.exports = InventoryProduct = mongoose.model(
+  "InventoryProduct",
+  inventoryProduct
 );

@@ -42,6 +42,7 @@ route.put(
       let typeMove = await TypeMove.findById(id);
       if (!typeMove) {
         return res.status(404).json({
+          name: "Tipo de Movimiento",
           message: "No se encontro el tipo de movimiento",
         });
       }
@@ -63,6 +64,7 @@ route.delete("/:id", async (req, res) => {
     let typeMove = await TypeMove.findById(id);
     if (!typeMove) {
       return res.status(404).json({
+        name: "Tipo de Movimiento",
         message: "No se encontro el tipo de movimiento",
       });
     }

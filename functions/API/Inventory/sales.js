@@ -73,6 +73,7 @@ route.post(
     const production_exist = await Production.findById(production);
     if (!production_exist) {
       return res.status(400).json({
+        name: "Produccion",
         message: "La producción no existe",
       });
     }

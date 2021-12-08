@@ -7,9 +7,9 @@ const productionCost = new mongoose.Schema(
       ref: "Production",
       required: true,
     },
-    production_product: {
+    inventory_product: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "ProductionProduct",
+      ref: "InventoryProduct",
       required: true,
     },
     description: {
@@ -21,10 +21,6 @@ const productionCost = new mongoose.Schema(
     },
     date: {
       type: Date,
-      required: true,
-    },
-    unit_price: {
-      type: Number,
       required: true,
     },
     total: {

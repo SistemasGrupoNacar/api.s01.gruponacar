@@ -10,7 +10,7 @@ route.get("/", async (req, res) => {
   try {
     let productionCost = await ProductionCost.find()
       .sort({ _id: 1 })
-      .populate("production_product", { name: 1 })
+      .populate("inventory_product", { name: 1 })
       .populate("production", { _id: 1 });
     return res.status(200).json(productionCost);
   } catch (err) {
@@ -41,7 +41,7 @@ route.get(
         },
       })
         .sort({ _id: 1 })
-        .populate("production_product", { name: 1 })
+        .populate("inventory_product", { name: 1 })
         .populate("production", { _id: 1 });
       //count total productionCost
       let totalProductionCost = await ProductionCost.aggregate([
@@ -81,7 +81,7 @@ route.post(
   body("production")
     .notEmpty()
     .withMessage("La produccion no debe estar vacia"),
-  body("production_product")
+  body("inventory_product")
     .notEmpty()
     .withMessage("El producto no debe estar vacio"),
   body("description").exists(),
@@ -89,19 +89,13 @@ route.post(
   body("quantity").isInt().withMessage("La cantidad debe ser un numero entero"),
   body("date").notEmpty().withMessage("La fecha no debe estar vacia"),
   body("date").isDate().withMessage("La fecha debe ser una fecha valida"),
-  body("unit_price")
-    .isNumeric()
-    .withMessage("El precio unitario debe ser numerico"),
-  body("unit_price")
-    .isNumeric()
-    .withMessage("El precio unitario debe ser numerico"),
   body("total").notEmpty().withMessage("El total no debe estar vacio"),
   body("total").isNumeric().withMessage("El total debe ser numerico"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
     const {
       production,
-      production_product,
+      inventory_product,
       quantity,
       description,
       date,
@@ -110,7 +104,7 @@ route.post(
     } = req.body;
     let productionCost = new ProductionCost({
       production,
-      production_product,
+      inventory_product,
       description,
       quantity,
       date,
@@ -124,6 +118,12 @@ route.post(
         { $push: { production_costs: response._id } },
         { new: true }
       );
+      //actualizar stock de inventoryProduct
+      await InventoryProduct.findByIdAndUpdate(inventory_product, {
+        $inc: {
+          stock: -quantity,
+        },
+      });
       return res.status(201).json(response);
     } catch (err) {
       return res.status(500).json({
@@ -143,6 +143,12 @@ route.delete("/:id", async (req, res) => {
       { $pull: { production_costs: response._id } },
       { new: true }
     );
+    //actualizar stock de inventoryProduct
+    await InventoryProduct.findByIdAndUpdate(response.inventory_product, {
+      $inc: {
+        stock: response.quantity,
+      },
+    });
     return res.status(200).json(response);
   } catch (err) {
     return res.status(500).json({
