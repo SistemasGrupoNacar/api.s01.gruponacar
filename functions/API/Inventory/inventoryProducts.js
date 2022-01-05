@@ -6,8 +6,47 @@ const { errors } = require("../../middleware/errors");
 const InventoryProduct = require("../../db/Models/Inventory/InventoryProduct");
 
 route.get("/", async (req, res) => {
-  let inventoryProducts = await InventoryProduct.find().sort({ _id: 1 });
-  res.status(200).json(inventoryProducts);
+  let inventoryProducts;
+  // Si hay un limite en el query
+  if (req.query.limit) {
+    let limit = parseInt(req.query.limit);
+    inventoryProducts = await InventoryProduct.find({})
+      .limit(limit)
+      .sort({ _id: 1 });
+  } else {
+    inventoryProducts = await InventoryProduct.find({}).sort({ _id: 1 });
+  }
+  return res.status(200).json(inventoryProducts);
+});
+
+// get specific inventory product
+route.get("/:id", async (req, res) => {
+  let inventoryProduct = await InventoryProduct.findById(req.params.id);
+  if (!inventoryProduct) {
+    return res.status(404).json({
+      name: "Producto de Inventario para Produccion",
+      message: "Inventory Product not found",
+    });
+  }
+  return res.status(200).json(inventoryProduct);
+});
+
+// obtener listado de productos con stock debajo del minimo
+route.get("/list/minStock", async (req, res) => {
+  try {
+    // obtener listado de productos
+    let inventoryProducts = await InventoryProduct.find().sort({ _id: 1 });
+    // obtener listado de productos con stock debajo del minimo
+    let minStockProducts = inventoryProducts.filter(
+      (product) => product.stock < product.min_stock
+    );
+    return res.status(200).json(minStockProducts);
+  } catch (err) {
+    return res.status(500).json({
+      name: err.name,
+      message: err.message,
+    });
+  }
 });
 
 route.post(
@@ -37,13 +76,56 @@ route.post(
       availability,
     });
     await inventoryProduct.save();
-    res.status(201).json(inventoryProduct);
+    return res.status(201).json(inventoryProduct);
+  }
+);
+
+//actualizar producto
+route.put(
+  "/:id",
+  body("name").notEmpty().withMessage("El nombre no debe estar vacio"),
+  body("description").exists(),
+  body("min_stock")
+    .isInt()
+    .withMessage("El stock minimo debe ser un numero entero"),
+  body("cost").isNumeric().withMessage("El costo debe ser un numero"),
+  body("cost").notEmpty().withMessage("El costo no debe estar vacio"),
+  body("availability")
+    .isBoolean()
+    .withMessage("La disponibilidad debe ser booleano"),
+  body("availability")
+    .notEmpty()
+    .withMessage("La disponibilidad no debe estar vacia"),
+  async (req, res) => {
+    errors.validationErrorResponse(req, res);
+    const { name, description, min_stock, cost, availability } = req.body;
+    try {
+      let inventoryProduct = await InventoryProduct.findById(req.params.id);
+      if (!inventoryProduct) {
+        return res.status(404).json({
+          name: "Producto de Inventario para Produccion",
+          message: "Inventory Product not found",
+        });
+      }
+      inventoryProduct.name = name;
+      inventoryProduct.description = description;
+      inventoryProduct.min_stock = min_stock;
+      inventoryProduct.cost = cost;
+      inventoryProduct.availability = availability;
+      await inventoryProduct.save();
+      return res.status(200).json(inventoryProduct);
+    } catch (err) {
+      return res.status(500).json({
+        name: err.name,
+        message: err.message,
+      });
+    }
   }
 );
 
 //actualizar el costo de un producto
 route.put(
-  "/:id",
+  "/:id/cost",
   body("cost").isNumeric().withMessage("El costo debe ser un numero"),
   body("cost").notEmpty().withMessage("El costo no debe estar vacio"),
   async (req, res) => {
@@ -78,7 +160,7 @@ route.delete("/:id", async (req, res) => {
     });
   }
   await inventoryProduct.remove();
-  res.status(200).json(inventoryProduct);
+  return res.status(200).json(inventoryProduct);
 });
 
 module.exports = route;

@@ -4,11 +4,27 @@ const { errors } = require("../../middleware/errors");
 const { getState } = require("../../db/db-status");
 const { body, param } = require("express-validator");
 const Product = require("../../db/Models/Inventory/Product");
+const { log } = require("console");
 
 route.get("/", async (req, res) => {
-  let products = await Product.find().sort({
-    name: 1,
-  });
+  let products;
+  // Si hay un limite en el query
+  if (req.query.limit) {
+    let limit = parseInt(req.query.limit);
+    products = await Product.find({}).limit(limit);
+  } else {
+    products = await Product.find({}).sort({ name: 1 });
+  }
+  return res.status(200).json(products);
+});
+
+// obtener un listado de los primeros 5 productos
+route.get("/", async (req, res) => {
+  let products = await Product.find()
+    .sort({
+      name: 1,
+    })
+    .limit(req.query.limit);
   return res.status(200).json(products);
 });
 

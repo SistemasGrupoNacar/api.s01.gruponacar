@@ -29,6 +29,8 @@ product.methods.toJSON = function () {
   delete obj.__v;
   delete obj.createdAt;
   delete obj.updatedAt;
+  // cambiar estado true o false en availability
+  obj.availability_text = obj.availability ? "Disponible" : "No disponible";
   return obj;
 };
 

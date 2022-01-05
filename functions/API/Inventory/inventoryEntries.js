@@ -7,7 +7,11 @@ const { errors } = require("../../middleware/errors");
 const InventoryProduct = require("../../db/Models/Inventory/InventoryProduct");
 
 route.get("/", async (req, res) => {
-  const inventoryEntries = await InventoryEntry.find({});
+  const inventoryEntries = await InventoryEntry.find({})
+    .populate("inventory_product")
+    .sort({
+      date: -1,
+    });
   res.status(200).json(inventoryEntries);
 });
 
