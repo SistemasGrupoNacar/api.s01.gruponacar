@@ -7,11 +7,24 @@ const { errors } = require("../../middleware/errors");
 const InventoryProduct = require("../../db/Models/Inventory/InventoryProduct");
 
 route.get("/", async (req, res) => {
-  const inventoryEntries = await InventoryEntry.find({})
-    .populate("inventory_product")
-    .sort({
-      date: -1,
-    });
+  // Verifica si hay un limite en el query
+  let inventoryEntries;
+  if (req.query.limit) {
+    let limit = parseInt(req.query.limit);
+    inventoryEntries = await InventoryEntry.find({})
+      .limit(limit)
+      .populate("inventory_product")
+      .sort({
+        date: -1,
+      });
+  } else {
+    inventoryEntries = await InventoryEntry.find({})
+      .populate("inventory_product")
+      .sort({
+        date: -1,
+      });
+  }
+
   res.status(200).json(inventoryEntries);
 });
 
@@ -20,9 +33,6 @@ route.post(
   body("inventory_product")
     .notEmpty()
     .withMessage("Producto de Inventario es requerido"),
-  body("date")
-    .isDate()
-    .withMessage("Fecha de Entrada de Inventario es requerido"),
   body("date")
     .notEmpty()
     .withMessage("Fecha de Entrada de Inventario es requerido"),

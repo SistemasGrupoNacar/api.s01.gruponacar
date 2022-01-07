@@ -8,10 +8,21 @@ const Production = require("../../db/Models/Inventory/Production");
 
 route.get("/", async (req, res) => {
   try {
-    const harvest = await Harvest.find({})
-      .sort({ _id: 1 })
-      .populate("product", { _id: 1, name: 1 })
-      .populate("production", { _id: 1 });
+    // Verifica si hay un limite en el query
+    let harvest;
+    if (req.query.limit) {
+      let limit = parseInt(req.query.limit);
+      harvest = await Harvest.find({})
+        .limit(limit)
+        .sort({ _id: 1 })
+        .populate("product", { _id: 1, name: 1 })
+        .populate("production", { _id: 1 });
+    } else {
+      harvest = await Harvest.find({})
+        .sort({ _id: 1 })
+        .populate("product", { _id: 1, name: 1 })
+        .populate("production", { _id: 1 });
+    }
 
     return res.status(200).json(harvest);
   } catch (error) {
