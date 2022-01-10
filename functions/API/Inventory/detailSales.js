@@ -10,6 +10,7 @@ route.get("/", async (req, res) => {
     const detailSale = await DetailSale.find({})
       .sort({ _id: 1 })
       .populate("sale", { _id: 1, date: 1, status: 1 })
+      .populate("production", { _id: 1 })
       .populate("product", { _id: 1, name: 1 });
     return res.status(200).json(detailSale);
   } catch (error) {
@@ -23,6 +24,7 @@ route.get("/", async (req, res) => {
 route.post(
   "/",
   body("sale").notEmpty().withMessage("Venta es requerida"),
+  body("production").notEmpty().withMessage("Produccion es requerida"),
   body("product").notEmpty().withMessage("Producto es requerido"),
   body("quantity").notEmpty().withMessage("Cantidad es requerida"),
   body("sub_total").notEmpty().withMessage("Sub total es requerido"),
@@ -37,7 +39,7 @@ route.post(
   async (req, res) => {
     //validacion de errores
     errors.validationErrorResponse(req, res);
-    const { sale, product, quantity, sub_total, total } = req.body;
+    const { sale, production, product, quantity, sub_total, total } = req.body;
     //obtiene el stock del producto
     const productFromDatabase = await Product.findOne({ _id: product }).select(
       "stock"
@@ -59,9 +61,21 @@ route.post(
       });
     }
 
+    // verifica si la produccion existe
+    const productionFromDatabase = await Production.findOne({
+      _id: production,
+    });
+    if (!productionFromDatabase) {
+      return res.status(400).json({
+        name: "Produccion no existe",
+        message: "La produccion no existe",
+      });
+    }
+
     //crea el detalle de la venta
     const detailSale = new DetailSale({
       sale,
+      production,
       product,
       quantity,
       sub_total,
@@ -78,6 +92,11 @@ route.post(
       await Product.findByIdAndUpdate(product, {
         $inc: { stock: -quantity },
       });
+      // agrega el detalle de la venta a la produccion
+      await Production.findByIdAndUpdate(production, {
+        $push: { detail_sales: response._id },
+      });
+
       return res.status(201).json(response);
     } catch (error) {
       return res.status(500).json({
@@ -148,6 +167,15 @@ route.delete("/:id", async (req, res) => {
     await Sale.findByIdAndUpdate(response.sale, {
       $pull: { detail_sale: response._id },
       $inc: { total: -response.total },
+    });
+    // Incrementar el stock del producto
+    await Product.findByIdAndUpdate(response.product, {
+      $inc: { stock: response.quantity },
+    });
+
+    // Eliminar los detail_sale de la produccion
+    await Production.findByIdAndUpdate(response.production, {
+      $pull: { detail_sales: response._id },
     });
     return res.status(200).json(response);
   } catch (error) {

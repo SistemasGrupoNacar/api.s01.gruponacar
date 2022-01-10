@@ -12,6 +12,10 @@ const detailSale = new mongoose.Schema(
       ref: "Product",
       required: true,
     },
+    production: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Production",
+    },
     quantity: {
       type: Number,
       required: true,

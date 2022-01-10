@@ -2,11 +2,6 @@ const mongoose = require("mongoose");
 
 const sale = new mongoose.Schema(
   {
-    production: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Production",
-      required: true,
-    },
     date: {
       type: Date,
       required: true,

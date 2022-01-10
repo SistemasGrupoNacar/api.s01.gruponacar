@@ -26,10 +26,10 @@ const production = new mongoose.Schema(
       ref: "Product",
       required: true,
     },
-    sales: [
+    detail_sales: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Sale",
+        ref: "DetailSale",
       },
     ],
     production_costs: [

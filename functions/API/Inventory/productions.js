@@ -9,7 +9,7 @@ route.get("/", async (req, res) => {
     .sort({ _id: 1 })
     .populate("place", { description: 1, _id: 0 })
     .populate("product", { name: 1, _id: 0 })
-    .populate("sales", { date: 1, status: 1, description: 1, total: 1 })
+    .populate("detail_sales", { date: 1, status: 1, description: 1, total: 1 })
     .populate("production_costs", {
       description: 1,
       date: 1,
@@ -34,7 +34,7 @@ route.get("/start/:startDate/:endDate", async (req, res) => {
       .sort({ _id: 1 })
       .populate("place", { description: 1, _id: 0 })
       .populate("product", { name: 1, _id: 0 })
-      //.populate("sales")
+      .populate("detail_sales", { _id: 1, quantity: 1, sub_total: 1, total: 1 })
       .populate("production_costs", {
         description: 1,
         date: 1,
@@ -65,7 +65,7 @@ route.get("/end/:startDate/:endDate", async (req, res) => {
       .sort({ _id: 1 })
       .populate("place", { description: 1, _id: 0 })
       .populate("product", { name: 1, _id: 0 })
-      //.populate("sales")
+      .populate("detail_sales", { _id: 1, quantity: 1, sub_total: 1, total: 1 })
       .populate("production_costs", {
         description: 1,
         date: 1,
@@ -132,7 +132,7 @@ route.put(
       .populate("production_costs")
       .populate("product")
       .populate("place")
-      .populate("sales");
+      .populate("detail_sales");
     //.populate("Salary");
 
     //validar que exista la produccion
@@ -173,13 +173,13 @@ route.put(
     });
 
     //calcular el total de ingresos
-    let total_sales = 0;
-    production.sales.forEach((sale) => {
-      total_sales += sale.total;
+    let total_detail_sales = 0;
+    production.detail_sales.forEach((detail_sale) => {
+      total_detail_sales += detail_sale.total;
     });
     production.extra_moves.forEach((move) => {
       if (move.type === "ingress") {
-        total_sales += move.total;
+        total_detail_sales += move.total;
       }
     });
 
@@ -190,7 +190,7 @@ route.put(
         end_date: end_date,
         in_progress: false,
         total_egress: total_costs,
-        total_ingress: total_sales,
+        total_ingress: total_detail_sales,
       },
       { new: true }
     );
