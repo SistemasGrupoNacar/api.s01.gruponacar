@@ -1,9 +1,12 @@
 const express = require("express");
 const route = express.Router();
-const { body, param } = require("express-validator");
+const { body, validationResult, param } = require("express-validator");
+
 const { errors } = require("../../middleware/errors");
 const Sale = require("../../db/Models/Inventory/Sale");
+const DetailSale = require("../../db/Models/Inventory/DetailSale");
 const Production = require("../../db/Models/Inventory/Production");
+const { log } = require("console");
 
 route.get("/", async (req, res) => {
   try {
@@ -35,6 +38,24 @@ route.get("/all", async (req, res) => {
         populate: { path: "product", select: "name" },
         select: "quantity sub_total total production",
       });
+    return res.status(200).json(sale);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
+
+// Obtener venta especifica
+route.get("/unique/:id", async (req, res) => {
+  try {
+    // Las que tengan status true
+    const sale = await Sale.findById(req.params.id).populate({
+      path: "detail_sale",
+      populate: { path: "product", select: "name" },
+      select: "quantity sub_total total production",
+    });
     return res.status(200).json(sale);
   } catch (error) {
     return res.status(500).json({
@@ -120,7 +141,10 @@ route.post(
   body("date").notEmpty().withMessage("Fecha es requerida"),
   body("date").isDate().withMessage("Fecha no es valida"),
   async (req, res) => {
-    errors.validationErrorResponse(req, res);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
     const { date, description } = req.body;
 
     const sale = new Sale({
@@ -168,29 +192,18 @@ route.delete("/:id", async (req, res) => {
     const sale = await Sale.findById(req.params.id);
 
     // eliminar cada detail_sale de production y aumentar el stock
-    const detail_sale = sale.detail_sale;
-    detail_sale.forEach(async (element) => {
-      const production = element.production;
-      // Quitar el id de detail_sale del array
-      await Production.findByIdAndUpdate(
-        production,
-        { $pull: { detail_sale: element._id } },
-        { new: true }
-      );
-    });
-
-    // Aumentar el stock del producto que se vendio en cada detail_sale
-
-    sale.detail_sale.forEach(async (element) => {
-      const detailSale = await DetailSale.findById(element._id);
-      const product = await Product.findById(detailSale.product);
-      await Product.findByIdAndUpdate(
-        product._id,
-        { $inc: { stock: detailSale.quantity } },
-        { new: true }
-      );
-    });
-
+    if (sale.detail_sale.length > 0) {
+      for (let i = 0; i < sale.detail_sale.length; i++) {
+        const detailSale = await DetailSale.findById(sale.detail_sale[i]);
+        const product = await Product.findById(detailSale.product);
+        await Product.findByIdAndUpdate(product._id, {
+          $inc: { stock: detailSale.quantity },
+        });
+        await Production.findByIdAndUpdate(detailSale.production, {
+          $pull: { detail_sale: detailSale._id },
+        });
+      }
+    }
     //eliminar cada detail_sale
     if (sale.detail_sale.length > 0) {
       for (let i = 0; i < sale.detail_sale.length; i++) {
