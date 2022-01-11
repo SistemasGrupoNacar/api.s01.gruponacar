@@ -5,16 +5,33 @@ const { body } = require("express-validator");
 const { errors } = require("../../middleware/errors");
 const InventoryProduct = require("../../db/Models/Inventory/InventoryProduct");
 
+// Obtiene todos los insumos habilitados
 route.get("/", async (req, res) => {
   let inventoryProducts;
   // Si hay un limite en el query
   if (req.query.limit) {
     let limit = parseInt(req.query.limit);
-    inventoryProducts = await InventoryProduct.find({})
+    inventoryProducts = await InventoryProduct.find({ availability: true })
       .limit(limit)
       .sort({ _id: 1 });
   } else {
-    inventoryProducts = await InventoryProduct.find({}).sort({ _id: 1 });
+    inventoryProducts = await InventoryProduct.find({
+      availability: true,
+    }).sort({ _id: 1 });
+  }
+  return res.status(200).json(inventoryProducts);
+});
+// Obtiene todos los insumos sin restricciones
+route.get("/", async (req, res) => {
+  let inventoryProducts;
+  // Si hay un limite en el query
+  if (req.query.limit) {
+    let limit = parseInt(req.query.limit);
+    inventoryProducts = await InventoryProduct.find()
+      .limit(limit)
+      .sort({ _id: 1 });
+  } else {
+    inventoryProducts = await InventoryProduct.find().sort({ _id: 1 });
   }
   return res.status(200).json(inventoryProducts);
 });

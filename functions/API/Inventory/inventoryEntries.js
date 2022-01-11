@@ -36,9 +36,7 @@ route.post(
   body("date")
     .notEmpty()
     .withMessage("Fecha de Entrada de Inventario es requerido"),
-  body("date")
-    .isISO8601()
-    .withMessage("Fecha de Entrada de Inventario es requerido"),
+  body("date").isDate().withMessage("Fecha no es valida"),
   body("quantity")
     .notEmpty()
     .withMessage("Cantidad de Entrada de Inventario es requerido"),

@@ -24,14 +24,8 @@ route.get("/", async (req, res) => {
 // endpoint get productionCost between two dates
 route.get(
   "/:startDate/:endDate",
-  param("startDate")
-    .isISO8601()
-    .toDate()
-    .withMessage("Fecha de inicio no es valida"),
-  param("endDate")
-    .isISO8601()
-    .toDate()
-    .withMessage("Fecha de fin no es valida"),
+  param("startDate").isDate().withMessage("Fecha de inicio no es valida"),
+  param("endDate").isDate().withMessage("Fecha de finalizacion no es valida"),
   async (req, res) => {
     try {
       let productionCost = await ProductionCost.find({
@@ -88,7 +82,7 @@ route.post(
   body("quantity").notEmpty().withMessage("La cantidad no debe estar vacia"),
   body("quantity").isInt().withMessage("La cantidad debe ser un numero entero"),
   body("date").notEmpty().withMessage("La fecha no debe estar vacia"),
-  body("date").isDate().withMessage("La fecha debe ser una fecha valida"),
+  body("date").isDate().withMessage("Fecha no es valida"),
   body("total").notEmpty().withMessage("El total no debe estar vacio"),
   body("total").isNumeric().withMessage("El total debe ser numerico"),
   async (req, res) => {

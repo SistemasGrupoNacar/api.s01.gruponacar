@@ -2,10 +2,17 @@ const express = require("express");
 const route = express.Router();
 const Place = require("../../db/Models/Inventory/Place");
 const { body } = require("express-validator");
-const {errors} = require("../../middleware/errors");
+const { errors } = require("../../middleware/errors");
 
+// Con restriccion de availability
 route.get("/", async (req, res) => {
-  let places = await Place.find().sort({ _id: 1 });
+  let places = await Place.find({ availability: true }).sort({ _id: 1 });
+  return res.status(200).json(places);
+});
+
+// Sin restriccion de availability
+route.get("/all", async (req, res) => {
+  let places = await Place.find({}).sort({ _id: 1 });
   return res.status(200).json(places);
 });
 

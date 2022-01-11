@@ -7,6 +7,27 @@ const Production = require("../../db/Models/Inventory/Production");
 
 route.get("/", async (req, res) => {
   try {
+    // Las que tengan status true
+    const sale = await Sale.find({ status: true })
+      .sort({ _id: 1 })
+      .populate({
+        path: "detail_sale",
+        populate: { path: "product", select: "name" },
+        select: "quantity sub_total total production",
+      });
+    return res.status(200).json(sale);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
+
+// Obtener todas las ventas sin restricciones
+route.get("/all", async (req, res) => {
+  try {
+    // Las que tengan status true
     const sale = await Sale.find({})
       .sort({ _id: 1 })
       .populate({
@@ -25,6 +46,42 @@ route.get("/", async (req, res) => {
 
 // obtener las ventas entre un rango de fechas
 route.get("/:startDate/:endDate", async (req, res) => {
+  try {
+    const { startDate, endDate } = req.params;
+    const sale = await Sale.find({
+      date: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+      status: true,
+    })
+      .sort({ _id: 1 })
+      .populate({
+        path: "detail_sale",
+        populate: { path: "product", select: "name" },
+        select: "quantity sub_total total production",
+      });
+    //count total in sales
+    const total = sale.reduce((acc, cur) => {
+      return acc + cur.total;
+    }, 0);
+
+    return res.status(200).json({
+      data: sale,
+      total,
+      startDate,
+      endDate,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
+
+// obtener las ventas entre un rango de fechas sin restricciones
+route.get("/:startDate/:endDate/all", async (req, res) => {
   try {
     const { startDate, endDate } = req.params;
     const sale = await Sale.find({
@@ -61,7 +118,7 @@ route.get("/:startDate/:endDate", async (req, res) => {
 route.post(
   "/",
   body("date").notEmpty().withMessage("Fecha es requerida"),
-  body("date").isISO8601().withMessage("Fecha no es válida"),
+  body("date").isDate().withMessage("Fecha no es valida"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
     const { date, description } = req.body;

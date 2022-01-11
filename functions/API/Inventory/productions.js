@@ -4,8 +4,9 @@ const { body } = require("express-validator");
 const { errors } = require("../../middleware/errors");
 const Production = require("../../db/Models/Inventory/Production");
 
+// En progreso
 route.get("/", async (req, res) => {
-  let productions = await Production.find()
+  let productions = await Production.find({ in_progress: true })
     .sort({ _id: 1 })
     .populate("place", { description: 1, _id: 0 })
     .populate("product", { name: 1, _id: 0 })
@@ -22,7 +23,26 @@ route.get("/", async (req, res) => {
   return res.status(200).json(productions);
 });
 
-//get production start between two dates
+// Todas
+route.get("/all", async (req, res) => {
+  let productions = await Production.find({})
+    .sort({ _id: 1 })
+    .populate("place", { description: 1, _id: 0 })
+    .populate("product", { name: 1, _id: 0 })
+    .populate("detail_sales", { date: 1, status: 1, description: 1, total: 1 })
+    .populate("production_costs", {
+      description: 1,
+      date: 1,
+      quantity: 1,
+      total: 1,
+      unit_price: 1,
+      status: 1,
+    })
+    .populate("harvest", { quantity: 1, date: 1, description: 1 });
+  return res.status(200).json(productions);
+});
+
+//get production start between two dates 
 route.get("/start/:startDate/:endDate", async (req, res) => {
   try {
     let productions = await Production.find({
@@ -118,9 +138,6 @@ route.put(
     .withMessage("La fecha de fin no debe estar vacia"),
   body("end_date")
     .isDate()
-    .withMessage("La fecha de fin debe ser una fecha valida"),
-  body("end_date")
-    .isISO8601()
     .withMessage("La fecha de fin debe ser una fecha valida"),
   async (req, res) => {
     // validacion de errores

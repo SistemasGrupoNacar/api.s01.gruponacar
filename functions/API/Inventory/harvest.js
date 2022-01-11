@@ -73,7 +73,7 @@ route.post(
   body("production").notEmpty().withMessage("Producción es requerida"),
   body("quantity").notEmpty().withMessage("Cantidad es requerida"),
   body("date").notEmpty().withMessage("Fecha es requerida"),
-  body("date").isISO8601().withMessage("Fecha no es válida"),
+  body("date").isDate().withMessage("Fecha no es valida"),
   body("quantity").isInt().withMessage("Cantidad no es válida"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
