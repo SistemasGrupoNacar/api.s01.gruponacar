@@ -200,19 +200,21 @@ route.delete("/:id", async (req, res) => {
           $inc: { stock: detailSale.quantity },
         });
         await Production.findByIdAndUpdate(detailSale.production, {
-          $pull: { detail_sale: detailSale._id },
+          $pull: { detail_sales: detailSale._id },
         });
       }
     }
     //eliminar cada detail_sale
-    if (sale.detail_sale.length > 0) {
+    /*if (sale.detail_sale.length > 0) {
       for (let i = 0; i < sale.detail_sale.length; i++) {
         await DetailSale.findByIdAndDelete(sale.detail_sale[i]);
       }
-    }
+    }*/
 
-    const response = await Sale.findByIdAndDelete(req.params.id);
-
+    const response = await Sale.findByIdAndUpdate(req.params.id, {
+      status: false,
+    });
+    //const response = await Sale.findByIdAndDelete(req.params.id);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({
