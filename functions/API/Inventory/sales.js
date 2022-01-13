@@ -211,11 +211,16 @@ route.delete("/:id", async (req, res) => {
       }
     }*/
 
-    const response = await Sale.findByIdAndUpdate(req.params.id, {
-      status: false,
-    });
-    //const response = await Sale.findByIdAndDelete(req.params.id);
-    return res.status(200).json(response);
+    // Verifica si existe detalle de venta para eliminar la venta o solo ponerle status false
+    if (sale.detail_sale.length > 0) {
+      const response = await Sale.findByIdAndUpdate(req.params.id, {
+        status: false,
+      });
+      return res.status(200).json(response);
+    } else {
+      const response = await Sale.findByIdAndDelete(req.params.id);
+      return res.status(200).json(response);
+    }
   } catch (error) {
     return res.status(500).json({
       name: error.name,

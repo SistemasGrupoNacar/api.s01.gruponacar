@@ -1,7 +1,7 @@
 const express = require("express");
 const route = express.Router();
 const mongoose = require("mongoose");
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 const { errors } = require("../../middleware/errors");
 const InventoryProduct = require("../../db/Models/Inventory/InventoryProduct");
 
@@ -22,7 +22,7 @@ route.get("/", async (req, res) => {
   return res.status(200).json(inventoryProducts);
 });
 // Obtiene todos los insumos sin restricciones
-route.get("/", async (req, res) => {
+route.get("/all", async (req, res) => {
   let inventoryProducts;
   // Si hay un limite en el query
   if (req.query.limit) {
@@ -94,6 +94,32 @@ route.post(
     });
     await inventoryProduct.save();
     return res.status(201).json(inventoryProduct);
+  }
+);
+
+// Actualizar availability de un producto
+route.put(
+  "/:id/available/:availability",
+  param("id").notEmpty().withMessage("El id no debe estar vacio"),
+  param("availability")
+    .notEmpty()
+    .withMessage("El availability no debe estar vacio"),
+  param("availability")
+    .isBoolean()
+    .withMessage("El availability debe ser booleano"),
+  async (req, res) => {
+    errors.validationErrorResponse(req, res);
+    const { id, availability } = req.params;
+    let inventoryProduct = await InventoryProduct.findById(id);
+    if (!inventoryProduct) {
+      return res.status(404).json({
+        name: "Producto de Inventario para Produccion",
+        message: "Producto de Inventario para Produccion no encontrado",
+      });
+    }
+    inventoryProduct.availability = availability;
+    await inventoryProduct.save();
+    return res.status(200).json(inventoryProduct);
   }
 );
 
