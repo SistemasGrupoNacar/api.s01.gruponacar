@@ -13,6 +13,7 @@ route.get("/", async (req, res) => {
           _id: "$date",
           total: { $sum: "$total" },
         },
+        sort: { _id: -1 },
       },
     ]);
     let graphicFormat = [];
