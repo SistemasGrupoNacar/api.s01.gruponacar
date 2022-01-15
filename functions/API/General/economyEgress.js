@@ -90,7 +90,7 @@ const graphicFunction = (data) => {
   let graphic = {};
   data.forEach((element) => {
     // Primero se recorta la fecha
-    element._id = element._id.toISOString().split("T")[0];
+    element._id = "'" + element._id.toISOString().split("T")[0] + "'";
     // Se asocia con un objeto de tipo clave - valor
     graphic[element._id] = element.total;
   });
