@@ -60,7 +60,6 @@ route.get("/", async (req, res) => {
       inventoryEntries
     );
 
-    console.log(startDate, endDate);
     const response = {
       graphic,
       totalEgress,
@@ -88,9 +87,12 @@ const infoFunction = (inventoryEntries) => {
 
 // Funcion que permite acomodar los datos para la grafica del frontend
 const graphicFunction = (data) => {
-  let graphic = [];
+  let graphic = {};
   data.forEach((element) => {
-    graphic.push([element._id, element.total]);
+    // Primero se recorta la fecha
+    element._id = element._id.toISOString().split("T")[0];
+    // Se asocia con un objeto de tipo clave - valor
+    graphic[element._id] = element.total;
   });
   return graphic;
 };
