@@ -51,20 +51,36 @@ route.get("/", async (req, res) => {
 
     // Obtener los gastos extras y formatearlo
 
-    // Obtener datos informativos
-    const totalEgress = infoFunction(inventoryEntries);
+    // Obtener totales
+    const totalInventoryProducts = totalFunction(inventoryEntries);
+    // Redondear a dos decimales
+    const total = Math.round(totalInventoryProducts * 100) / 100;
+
     // Asignar fecha de inicio y fin
-    const { startDate, endDate } = checkDates(
+    const inventoryProductsDates = checkDates(
       req.query.startDate,
       req.query.endDate,
       inventoryEntries
     );
+    /*const salariesDates = checkDates(
+      req.query.startDate,
+      req.query.endDate,
+      salaries
+    );*/
 
     const response = {
-      graphic,
-      totalEgress,
-      startDate,
-      endDate,
+      general: {
+        total,
+      },
+      inventoryProducts: {
+        graphic,
+        total: totalInventoryProducts,
+        startDate: inventoryProductsDates.startDate,
+        endDate: inventoryProductsDates.endDate,
+        filtered: inventoryProductsDates.filtered,
+      },
+      salaries: {},
+      extraMoves: {},
     };
 
     res.status(200).json(response);
@@ -77,8 +93,8 @@ route.get("/", async (req, res) => {
 });
 
 // Recoge y devuelve informacion
-const infoFunction = (inventoryEntries) => {
-  return inventoryEntries
+const totalFunction = (data) => {
+  return data
     .reduce((acc, cur) => {
       return acc + cur.total;
     }, 0)
@@ -101,11 +117,13 @@ const graphicFunction = (data) => {
 const checkDates = (startDateI, endDateI, data) => {
   if (typeof startDateI === "undefined" || typeof endDateI === "undefined") {
     const { startDate, endDate } = getDates(data);
-    return { startDate, endDate };
+    const filtered = false;
+    return { startDate, endDate, filtered };
   } else {
     const startDate = startDateI;
     const endDate = endDateI;
-    return { startDate, endDate };
+    const filtered = true;
+    return { startDate, endDate, filtered };
   }
 };
 

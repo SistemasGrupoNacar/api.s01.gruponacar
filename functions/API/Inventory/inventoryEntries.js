@@ -2,7 +2,7 @@ const express = require("express");
 const route = express.Router();
 const InventoryEntry = require("../../db/Models/Inventory/InventoryEntry");
 const mongoose = require("mongoose");
-const { body } = require("express-validator");
+const { body, validationResult } = require("express-validator");
 const { errors } = require("../../middleware/errors");
 const InventoryProduct = require("../../db/Models/Inventory/InventoryProduct");
 
@@ -60,7 +60,10 @@ route.post(
     .isFloat({ min: 0 })
     .withMessage("Total de Entrada de Inventario debe ser mayor o igual a 0"),
   async (req, res) => {
-    errors.validationErrorResponse(req, res);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
     const { inventory_product, date, quantity, unit_price, total } = req.body;
     try {
       //verificando si existe el producto en inventario
