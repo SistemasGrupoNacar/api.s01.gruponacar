@@ -1,20 +1,17 @@
 const express = require("express");
 const route = express.Router();
-const InventoryEntry = require("../../db/Models/Inventory/InventoryEntry");
 const Sales = require("../../db/Models/Inventory/Sale");
-const { body } = require("express-validator");
 const { graphic } = require("../../scripts/graphic");
 const { checkDates } = require("../../scripts/dates");
 const { total } = require("../../scripts/total");
 
 route.get("/", async (req, res) => {
   try {
-    let inventoryEntries;
-
-    // Verificando si consulta por rango de fechas
+    let sales;
+    // Verificando si consulta rangos de fechas
     if (req.query.startDate && req.query.endDate) {
-      // Obtener las entradas de insumos y formatearlo con el rango de fecha dado
-      inventoryEntries = await InventoryEntry.aggregate([
+      // Obtener las ventas y formatearlo con el rango de fecha dado
+      sales = await Sales.aggregate([
         {
           $match: {
             date: {
@@ -34,8 +31,8 @@ route.get("/", async (req, res) => {
         },
       ]);
     } else {
-      // Obtener las entradas de insumos y formatearlo
-      inventoryEntries = await InventoryEntry.aggregate([
+      // Obtener las ventas y formatearlo
+      sales = await Sales.aggregate([
         {
           $group: {
             _id: "$date",
@@ -47,46 +44,37 @@ route.get("/", async (req, res) => {
         },
       ]);
     }
+    // Graficar los datos
+    const salesGraphic = graphic(sales);
 
-    // Graficar datos
-    const inventoryEntriesGraphic = graphic(inventoryEntries);
-
-    // Obtener los salarios y formatearlo
-
-    // Obtener los gastos extras y formatearlo
+    // Obtener los movimientos extras y formatearlo
 
     // Obtener totales
-    const totalInventoryProducts = total(inventoryEntries);
+    const totalSales = total(sales);
+
     // Redondear a dos decimales
-    const totalGeneral = Math.round(totalInventoryProducts * 100) / 100;
+    const totalGeneral = Math.round(totalSales * 100) / 100;
 
     // Asignar fecha de inicio y fin
-    const inventoryProductsDates = checkDates(
+    const salesDates = checkDates(
       req.query.startDate,
       req.query.endDate,
-      inventoryEntries
+      sales
     );
-    /*const salariesDates = checkDates(
-      req.query.startDate,
-      req.query.endDate,
-      salaries
-    );*/
 
     const response = {
       general: {
         total: totalGeneral,
       },
-      inventoryProducts: {
-        graphic: inventoryEntriesGraphic,
-        total: totalInventoryProducts,
-        startDate: inventoryProductsDates.startDate,
-        endDate: inventoryProductsDates.endDate,
-        filtered: inventoryProductsDates.filtered,
+      sales: {
+        graphic: salesGraphic,
+        total: totalSales,
+        startDate: salesDates.startDate,
+        endDate: salesDates.endDate,
+        filtered: salesDates.filtered,
       },
-      salaries: {},
       extraMoves: {},
     };
-
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({
