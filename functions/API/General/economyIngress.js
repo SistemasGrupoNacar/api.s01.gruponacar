@@ -4,6 +4,7 @@ const Sales = require("../../db/Models/Inventory/Sale");
 const { graphic } = require("../../scripts/graphic");
 const { checkDates } = require("../../scripts/dates");
 const { total } = require("../../scripts/total");
+const { getDataLastThreeMonths } = require("../../scripts/statistics");
 
 route.get("/", async (req, res) => {
   try {
@@ -62,9 +63,13 @@ route.get("/", async (req, res) => {
       sales
     );
 
+    // Obtener datos estadísticos
+    const statisticsThreeMonths = getDataLastThreeMonths(sales);
+
     const response = {
       general: {
         total: totalGeneral,
+        statisticsSales: statisticsThreeMonths,
       },
       sales: {
         graphic: salesGraphic,

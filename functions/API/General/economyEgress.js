@@ -6,6 +6,7 @@ const { body } = require("express-validator");
 const { graphic } = require("../../scripts/graphic");
 const { checkDates } = require("../../scripts/dates");
 const { total } = require("../../scripts/total");
+const { getDataLastThreeMonths } = require("../../scripts/statistics");
 
 route.get("/", async (req, res) => {
   try {
@@ -72,9 +73,12 @@ route.get("/", async (req, res) => {
       salaries
     );*/
 
+    // Obtener datos estadisticos
+    const statisticsThreeMonths = getDataLastThreeMonths(inventoryEntries);
     const response = {
       general: {
         total: totalGeneral,
+        statisticsInventoryEntries: statisticsThreeMonths,
       },
       inventoryProducts: {
         graphic: inventoryEntriesGraphic,
