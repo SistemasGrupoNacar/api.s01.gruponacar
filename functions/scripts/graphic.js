@@ -9,9 +9,9 @@ function graphic(data) {
       .split("/")
       .reverse();
     const date = temporalDate[0] + "/" + temporalDate[1];
-    element._id = date;
+    element.date = date;
     // Se asocia con un objeto de tipo clave - valor
-    graphic[element._id] = element.total;
+    graphic[element.date] = element.total;
   });
   return graphic;
 }

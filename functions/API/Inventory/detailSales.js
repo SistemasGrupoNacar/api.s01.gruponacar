@@ -78,8 +78,8 @@ route.post(
       production,
       product,
       quantity,
-      sub_total,
-      total,
+      sub_total: Math.round(sub_total * 100) / 100,
+      total: Math.round(total * 100) / 100,
     });
     try {
       //guarda el detalle de la venta

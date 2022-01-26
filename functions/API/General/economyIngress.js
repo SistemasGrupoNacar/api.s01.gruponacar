@@ -4,7 +4,10 @@ const Sales = require("../../db/Models/Inventory/Sale");
 const { graphic } = require("../../scripts/graphic");
 const { checkDates } = require("../../scripts/dates");
 const { total } = require("../../scripts/total");
-const { getDataLastThreeMonths } = require("../../scripts/statistics");
+const {
+  getDataLastThreeMonths,
+  verifyDataForPercentage,
+} = require("../../scripts/statistics");
 
 route.get("/", async (req, res) => {
   try {
@@ -66,10 +69,13 @@ route.get("/", async (req, res) => {
     // Obtener datos estadísticos
     const statisticsThreeMonths = getDataLastThreeMonths(sales);
 
+    // Obtiene el porcentaje de incremento o decremento
+    const percentageIncDec = verifyDataForPercentage(statisticsThreeMonths);
     const response = {
       general: {
         total: totalGeneral,
         statisticsSales: statisticsThreeMonths,
+        percentageIncDec,
       },
       sales: {
         graphic: salesGraphic,

@@ -6,7 +6,11 @@ const { body } = require("express-validator");
 const { graphic } = require("../../scripts/graphic");
 const { checkDates } = require("../../scripts/dates");
 const { total } = require("../../scripts/total");
-const { getDataLastThreeMonths } = require("../../scripts/statistics");
+const {
+  getDataLastThreeMonths,
+  verifyDataForPercentage,
+} = require("../../scripts/statistics");
+const { log } = require("console");
 
 route.get("/", async (req, res) => {
   try {
@@ -75,10 +79,13 @@ route.get("/", async (req, res) => {
 
     // Obtener datos estadisticos
     const statisticsThreeMonths = getDataLastThreeMonths(inventoryEntries);
+    // Obtiene el porcentaje de incremento o decremento
+    const percentageIncDec = verifyDataForPercentage(statisticsThreeMonths);
     const response = {
       general: {
         total: totalGeneral,
         statisticsInventoryEntries: statisticsThreeMonths,
+        percentageIncDec,
       },
       inventoryProducts: {
         graphic: inventoryEntriesGraphic,

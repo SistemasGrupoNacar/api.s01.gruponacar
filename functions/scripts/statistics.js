@@ -1,3 +1,4 @@
+// Obtiene los datos de los ultimos 3 meses
 const getDataLastThreeMonths = (data) => {
   // Declaracion de variables
   let lastThreeMonths = [];
@@ -42,6 +43,24 @@ const getDataLastThreeMonths = (data) => {
   return lastThreeMonths;
 };
 
+// Obtiene el porcentaje de incremento o decremento
+const getPercentage = (current, previous) => {
+  const percentage = ((current - previous) / previous) * 100;
+  return Math.round(percentage);
+};
+
+// Ordena y verifica el porcentaje de incremento
+const verifyDataForPercentage = (data) => {
+  // Verifica si el arreglo de datos es mayor o igual a 2
+  if (data.length == 2) {
+    return getPercentage(data[1].total, data[0].total);
+  } else if (data.length == 3) {
+    return getPercentage(data[2].total, data[1].total);
+  } else {
+    return null;
+  }
+};
+
 // Obtener el nombre del mes por medio del numero recibido
 const getMonthName = (month) => {
   switch (month) {
@@ -76,4 +95,6 @@ const getMonthName = (month) => {
 
 module.exports = {
   getDataLastThreeMonths,
+  getPercentage,
+  verifyDataForPercentage,
 };
