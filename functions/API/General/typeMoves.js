@@ -5,9 +5,9 @@ const { body } = require("express-validator");
 const TypeMove = require("../../db/Models/General/TypeMove");
 let { authenticateToken } = require("../../middleware/auth");
 
-route.get("/", authenticateToken, async (req, res) => {
+route.get("/", async (req, res) => {
   let typeMove = await TypeMove.find().sort({ _id: 1 });
-  res.status(200).json(typeMove);
+  return res.status(200).json(typeMove);
 });
 
 route.post(
@@ -58,7 +58,7 @@ route.put(
   }
 );
 
-route.delete("/:id", async (req, res) => {
+route.delete("/:id",authenticateToken, async (req, res) => {
   const { id } = req.params;
   try {
     let typeMove = await TypeMove.findById(id);
