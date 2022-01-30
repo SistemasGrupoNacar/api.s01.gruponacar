@@ -10,14 +10,29 @@ const { log } = require("console");
 
 route.get("/", async (req, res) => {
   try {
-    // Las que tengan status true
-    const sale = await Sale.find({ status: true })
-      .sort({ _id: 1 })
-      .populate({
-        path: "detail_sale",
-        populate: { path: "product", select: "name" },
-        select: "quantity sub_total total production",
-      });
+    let sale;
+    // Verifica si no tiene limit
+    if (req.query.limit) {
+      let limit = parseInt(req.query.limit);
+      // Las que tengan status true
+      sale = await Sale.find({ status: true })
+        .sort({ _id: 1 })
+        .populate({
+          path: "detail_sale",
+          populate: { path: "product", select: "name" },
+          select: "quantity sub_total total production",
+        })
+        .limit(limit);
+    } else {
+      sale = await Sale.find({ status: true })
+        .sort({ _id: 1 })
+        .populate({
+          path: "detail_sale",
+          populate: { path: "product", select: "name" },
+          select: "quantity sub_total total production",
+        });
+    }
+
     return res.status(200).json(sale);
   } catch (error) {
     return res.status(500).json({
@@ -30,14 +45,30 @@ route.get("/", async (req, res) => {
 // Obtener todas las ventas sin restricciones
 route.get("/all", async (req, res) => {
   try {
-    // Las que tengan status true
-    const sale = await Sale.find({})
-      .sort({ _id: 1 })
-      .populate({
-        path: "detail_sale",
-        populate: { path: "product", select: "name" },
-        select: "quantity sub_total total production",
-      });
+    let sale;
+    // Verifica si no tiene limit
+    if (req.query.limit) {
+      let limit = parseInt(req.query.limit);
+      // Las que tengan status true
+      sale = await Sale.find({})
+        .sort({ _id: 1 })
+        .populate({
+          path: "detail_sale",
+          populate: { path: "product", select: "name" },
+          select: "quantity sub_total total production",
+        })
+        .limit(limit);
+    } else {
+      // Las que tengan status true
+      sale = await Sale.find({})
+        .sort({ _id: 1 })
+        .populate({
+          path: "detail_sale",
+          populate: { path: "product", select: "name" },
+          select: "quantity sub_total total production",
+        });
+    }
+
     return res.status(200).json(sale);
   } catch (error) {
     return res.status(500).json({

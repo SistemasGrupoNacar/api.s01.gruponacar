@@ -26,6 +26,8 @@ route.get("/", async (req, res) => {
               $gte: new Date(req.query.startDate),
               $lte: new Date(req.query.endDate),
             },
+            // Verificar que este con estado true
+            status: true,
           },
         },
         {
@@ -61,6 +63,12 @@ route.get("/", async (req, res) => {
     } else {
       // Obtener las ventas y formatearlo
       sales = await Sales.aggregate([
+        {
+          $match: {
+            // Verificar que este con estado true
+            status: true,
+          },
+        },
         {
           $group: {
             _id: "$date",
