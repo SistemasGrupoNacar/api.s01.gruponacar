@@ -35,6 +35,13 @@ harvest.methods.toJSON = function () {
   delete obj.createdAt;
   delete obj.updatedAt;
   delete obj.__v;
+
+  // Convertir fecha a local
+  obj.date_format = new Date(obj.date).toLocaleString("es-ES", {
+    timeZone: "America/El_Salvador",
+    hour12: true,
+  });
+
   return obj;
 };
 

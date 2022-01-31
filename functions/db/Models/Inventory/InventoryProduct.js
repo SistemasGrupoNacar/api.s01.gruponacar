@@ -39,6 +39,12 @@ inventoryProduct.methods.toJSON = function () {
   delete obj.__v;
   // cambiar estado true o false en availability
   obj.availability_text = obj.availability ? "Disponible" : "No disponible";
+
+  // Convertir el total a dolar
+  obj.cost_format = obj.cost.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
   return obj;
 };
 

@@ -10,6 +10,7 @@ route.get("/", async (req, res) => {
     let extraMoves = await ExtraMove.find()
       // Popular con typeMove
       .populate("type_move", { title: 1, _id: 1 });
+
     return res.status(200).json(extraMoves);
   } catch (error) {
     return res.status(500).json({

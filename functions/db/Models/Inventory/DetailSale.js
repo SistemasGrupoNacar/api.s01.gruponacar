@@ -40,6 +40,18 @@ detailSale.methods.toJSON = function () {
   delete obj.createdAt;
   delete obj.updatedAt;
   delete obj.__v;
+
+  // Convertir el total a dolar
+  obj.sub_total_format = obj.sub_total.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+  // Convertir el total a dolar
+  obj.total_format = obj.total.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+
   return obj;
 };
 

@@ -81,6 +81,32 @@ production.methods.toJSON = function () {
   delete obj.__v;
   delete obj.createdAt;
   delete obj.updatedAt;
+
+  // Convertir fecha a local
+  obj.start_date_format = new Date(obj.start_date).toLocaleString("es-ES", {
+    timeZone: "America/El_Salvador",
+    hour12: true,
+  });
+
+  // Convertir fecha a local
+  if (obj.end_date != null) {
+    obj.end_date_format = new Date(obj.end_date).toLocaleString("es-ES", {
+      timeZone: "America/El_Salvador",
+      hour12: true,
+    });
+  }
+
+  // Convertir el total a dolar
+  obj.total_ingress_format = obj.total_ingress.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+  // Convertir el total a dolar
+  obj.total_egress_format = obj.total_egress.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+
   return obj;
 };
 
