@@ -170,7 +170,7 @@ route.get("/:startDate/:endDate/all", async (req, res) => {
 route.post(
   "/",
   body("date").notEmpty().withMessage("Fecha es requerida"),
-  body("date").isDate().withMessage("Fecha no es valida"),
+  body("date").isISO8601().withMessage("Fecha no valida"),
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

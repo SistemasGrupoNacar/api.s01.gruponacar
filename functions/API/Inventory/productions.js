@@ -42,7 +42,7 @@ route.get("/all", async (req, res) => {
   return res.status(200).json(productions);
 });
 
-//get production start between two dates 
+//get production start between two dates
 route.get("/start/:startDate/:endDate", async (req, res) => {
   try {
     let productions = await Production.find({
@@ -112,8 +112,8 @@ route.post(
   body("description").exists(),
   body("place").notEmpty().withMessage("El lugar no debe estar vacio"),
   body("start_date")
-    .isDate()
-    .withMessage("La fecha de inicio debe ser una fecha valida"),
+    .isISO8601()
+    .withMessage("La fecha debe ser una fecha valida"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
     const { product, status, start_date, description, place } = req.body;
@@ -137,8 +137,8 @@ route.put(
     .notEmpty()
     .withMessage("La fecha de fin no debe estar vacia"),
   body("end_date")
-    .isDate()
-    .withMessage("La fecha de fin debe ser una fecha valida"),
+    .isISO8601()
+    .withMessage("La fecha debe ser una fecha valida"),
   async (req, res) => {
     // validacion de errores
     errors.validationErrorResponse(req, res);

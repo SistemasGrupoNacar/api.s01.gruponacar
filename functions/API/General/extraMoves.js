@@ -24,7 +24,7 @@ route.post(
   body("description").notEmpty().withMessage("Descripción es requerida"),
   body("type_move").notEmpty().withMessage("Tipo de movimiento es requerido"),
   body("type_move").isMongoId().withMessage("Tipo de movimiento no válido"),
-  body("date").isDate().withMessage("Fecha de movimiento es requerida"),
+  body("date").isISO8601().withMessage("Fecha no válida"),
   body("total").notEmpty().withMessage("Total es requerido"),
   body("total").isNumeric().withMessage("Total debe ser un número"),
   async (req, res) => {
