@@ -4,11 +4,11 @@ const getDataLastThreeMonths = (data) => {
   let lastThreeMonths = [];
 
   // Obtener el mes actual
-  const currentMonth = new Date().getMonth() + 1;
+  const currentMonth = new Date().getUTCMonth() + 1;
 
   // Recorrer todos los datos
   data.forEach((element) => {
-    const month = new Date(element._id).getMonth() + 1;
+    const month = new Date(element._id).getUTCMonth() + 1;
 
     for (let i = 0; i < 3; i++) {
       // Verificar si el mes actual menos el rango es negativo
@@ -29,13 +29,10 @@ const getDataLastThreeMonths = (data) => {
             month,
             monthName: getMonthName(month),
             total: element.total,
-            quantityDays: 1,
           });
         } else {
           // Si existe, sumar el total
           lastThreeMonths[index].total += element.total;
-          // Sumar un dia de trabajo
-          lastThreeMonths[index].quantityDays++;
         }
       }
     }
@@ -96,16 +93,15 @@ const getMonthName = (month) => {
 // Obtiene los datos del mes actual
 const getDataCurrentMonth = (sales, extra) => {
   // Obtener el mes actual
-  const currentMonth = new Date().getMonth() + 1;
-
+  const currentMonth = new Date().getUTCMonth() + 1;
   // Recorrer todos los datos
   let thisMonthSales = sales.filter((element) => {
-    const month = new Date(element._id).getMonth() + 1;
+    const month = new Date(element._id).getUTCMonth() + 1;
     return month === currentMonth;
   });
 
   let thisMonthExtra = extra.filter((element) => {
-    const month = new Date(element._id).getMonth() + 1;
+    const month = new Date(element._id).getUTCMonth() + 1;
     return month === currentMonth;
   });
   // Unir datos

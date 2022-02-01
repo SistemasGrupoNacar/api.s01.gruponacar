@@ -34,7 +34,7 @@ route.get("/", async (req, res) => {
         },
         {
           $group: {
-            _id: "$date",
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
             total: { $sum: "$total" },
           },
         },
@@ -54,7 +54,7 @@ route.get("/", async (req, res) => {
         },
         {
           $group: {
-            _id: "$date",
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
             total: { $sum: "$total" },
           },
         },
@@ -73,7 +73,7 @@ route.get("/", async (req, res) => {
         },
         {
           $group: {
-            _id: "$date",
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
             total: { $sum: "$total" },
           },
         },
@@ -90,7 +90,7 @@ route.get("/", async (req, res) => {
         },
         {
           $group: {
-            _id: "$date",
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
             total: { $sum: "$total" },
           },
         },
@@ -142,7 +142,9 @@ route.get("/", async (req, res) => {
     );
 
     // Obtener datos estadísticos
-    const statisticsThreeMonths = getDataLastThreeMonths(sales);
+    const statisticsThreeMonths = getDataLastThreeMonths(
+      sales.concat(extraMoves)
+    );
 
     // Obtiene el porcentaje de incremento o decremento
     const percentageIncDec = verifyDataForPercentage(statisticsThreeMonths);

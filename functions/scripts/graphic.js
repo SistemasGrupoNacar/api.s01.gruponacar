@@ -3,8 +3,6 @@ function graphic(data) {
   data.forEach((element) => {
     // Primero se recorta la fecha
     const temporalDate = element._id
-      .toISOString()
-      .substring(0, 10)
       .replace(/-/g, "/")
       .split("/")
       .reverse();
