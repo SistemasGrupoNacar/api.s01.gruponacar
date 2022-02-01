@@ -93,8 +93,58 @@ const getMonthName = (month) => {
   }
 };
 
+// Obtiene los datos del mes actual
+const getDataCurrentMonth = (sales, extra) => {
+  // Obtener el mes actual
+  const currentMonth = new Date().getMonth() + 1;
+
+  // Recorrer todos los datos
+  let thisMonthSales = sales.filter((element) => {
+    const month = new Date(element._id).getMonth() + 1;
+    return month === currentMonth;
+  });
+
+  let thisMonthExtra = extra.filter((element) => {
+    const month = new Date(element._id).getMonth() + 1;
+    return month === currentMonth;
+  });
+  // Unir datos
+  const data = thisMonthSales.concat(thisMonthExtra);
+  // Sacar el total de los extras
+  const totalExtra = totalFunction(thisMonthExtra);
+
+  // Calcular total del mes
+  const { total, total_format } = totalFunction(data);
+
+  // Calcular el porcentaje del total que corresponde a movimientos extra redondeado a dos decimales
+  const percentage = (totalExtra.total / total) * 100;
+  const percentage_format = percentage.toFixed(2);
+
+  return {
+    data,
+    total,
+    total_format,
+    extra_percentage: percentage,
+    extra_percentage_format: percentage_format,
+  };
+};
+
+const totalFunction = (data) => {
+  let total = 0;
+  data.forEach((element) => {
+    total += element.total;
+  });
+  // Total formateada como moneda
+  const total_format = total.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+  return { total, total_format };
+};
+
 module.exports = {
   getDataLastThreeMonths,
   getPercentage,
   verifyDataForPercentage,
+  getDataCurrentMonth,
 };
