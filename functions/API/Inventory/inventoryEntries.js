@@ -88,10 +88,13 @@ route.post(
         total,
       });
       await inventoryEntry.save();
-      //aumentando el stock de inventoryProduct
+      //aumentando el stock de inventoryProduct y actualizando el precio unitario
       await InventoryProduct.findByIdAndUpdate(inventory_product, {
         $inc: {
           stock: quantity,
+        },
+        $set: {
+          unit_price,
         },
       });
       return res.status(201).json(inventoryEntry);

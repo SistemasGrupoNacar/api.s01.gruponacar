@@ -103,6 +103,8 @@ route.post(
           message: "El producto no existe",
         });
       }
+      
+
       // Asigna los valores de precio unitario y total dependiendo de lo que marque el producto en inventario
       const unit_price = inventoryProduct.cost;
       const total = quantity * unit_price;
