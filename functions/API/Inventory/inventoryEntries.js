@@ -94,7 +94,7 @@ route.post(
           stock: quantity,
         },
         $set: {
-          unit_price,
+          cost: unit_price,
         },
       });
       return res.status(201).json(inventoryEntry);
