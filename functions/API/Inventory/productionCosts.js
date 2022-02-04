@@ -1,7 +1,7 @@
 const express = require("express");
 const route = express.Router();
 const mongoose = require("mongoose");
-const { body, query, param } = require("express-validator");
+const { body, query, param, validationResult } = require("express-validator");
 const { errors } = require("../../middleware/errors");
 const ProductionCost = require("../../db/Models/Inventory/ProductionCost");
 const Production = require("../../db/Models/Inventory/Production");
@@ -86,26 +86,38 @@ route.post(
   body("total").notEmpty().withMessage("El total no debe estar vacio"),
   body("total").isNumeric().withMessage("El total debe ser numerico"),
   async (req, res) => {
-    errors.validationErrorResponse(req, res);
-    const {
-      production,
-      inventory_product,
-      quantity,
-      description,
-      date,
-      unit_price,
-      total,
-    } = req.body;
-    let productionCost = new ProductionCost({
-      production,
-      inventory_product,
-      description,
-      quantity,
-      date,
-      unit_price,
-      total,
-    });
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    // Obtiene los datos del post
+    const { production, inventory_product, quantity, description, date } =
+      req.body;
+
     try {
+      // Obtiene el producto de inventario de la base de datos
+      const inventoryProduct = await InventoryProduct.findById(
+        inventory_product
+      );
+      if (!inventoryProduct) {
+        return res.status(404).json({
+          name: "Producto de inventario",
+          message: "El producto no existe",
+        });
+      }
+      // Asigna los valores de precio unitario y total dependiendo de lo que marque el producto en inventario
+      const unit_price = inventoryProduct.cost;
+      const total = quantity * unit_price;
+      // Crea el modelo de costo de produccion
+      let productionCost = new ProductionCost({
+        production,
+        inventory_product,
+        description,
+        quantity,
+        date,
+        unit_price,
+        total,
+      });
       let response = await productionCost.save();
       await Production.findByIdAndUpdate(
         production,
