@@ -83,8 +83,6 @@ route.post(
   body("quantity").isInt().withMessage("La cantidad debe ser un numero entero"),
   body("date").notEmpty().withMessage("La fecha no debe estar vacia"),
   body("date").isISO8601().withMessage("La fecha no es valida"),
-  body("total").notEmpty().withMessage("El total no debe estar vacio"),
-  body("total").isNumeric().withMessage("El total debe ser numerico"),
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
