@@ -8,10 +8,9 @@ const { total } = require("../../scripts/total");
 const {
   getDataLastThreeMonths,
   verifyDataForPercentage,
-  getDataCurrentMonth,
+  getDataCurrentMonthIngress,
 } = require("../../scripts/statistics");
 const ExtraMove = require("../../db/Models/General/ExtraMove");
-const { log } = require("console");
 // Se declara el valor del tipo de movimiento para ingresos
 var val = mongoose.Types.ObjectId("61dc6d250dea196d5fdf0bf7");
 route.get("/", async (req, res) => {
@@ -100,7 +99,7 @@ route.get("/", async (req, res) => {
       ]);
     }
     // Obtiene los datos del mes actual
-    const currentMonth = getDataCurrentMonth(sales, extraMoves);
+    const currentMonth = getDataCurrentMonthIngress(sales, extraMoves);
     // Graficar los datos
     const salesGraphic = graphic(sales);
     const extraMovesGraphic = graphic(extraMoves);
@@ -157,7 +156,7 @@ route.get("/", async (req, res) => {
         extraPercentageFormat: currentMonth.extra_percentage_format,
         totalAll: totalGeneral,
         totalAllFormat: totalGeneralFormat,
-        statisticsSales: statisticsThreeMonths,
+        statisticsIngressThreeMonths: statisticsThreeMonths,
         percentageIncDec,
       },
       sales: {

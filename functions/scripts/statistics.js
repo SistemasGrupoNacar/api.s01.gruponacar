@@ -91,7 +91,7 @@ const getMonthName = (month) => {
 };
 
 // Obtiene los datos del mes actual
-const getDataCurrentMonth = (sales, extra) => {
+const getDataCurrentMonthIngress = (sales, extra) => {
   // Obtener el mes actual
   const currentMonth = new Date().getUTCMonth() + 1;
   // Recorrer todos los datos
@@ -106,6 +106,41 @@ const getDataCurrentMonth = (sales, extra) => {
   });
   // Unir datos
   const data = thisMonthSales.concat(thisMonthExtra);
+  // Sacar el total de los extras
+  const totalExtra = totalFunction(thisMonthExtra);
+
+  // Calcular total del mes
+  const { total, total_format } = totalFunction(data);
+
+  // Calcular el porcentaje del total que corresponde a movimientos extra redondeado a dos decimales
+  const percentage = (totalExtra.total / total) * 100;
+  const percentage_format = percentage.toFixed(2);
+
+  return {
+    data,
+    total,
+    total_format,
+    extra_percentage: percentage,
+    extra_percentage_format: percentage_format,
+  };
+};
+
+// Obtiene los datos del mes actual en egresos
+const getDataCurrentMonthEgress = (egress, extra) => {
+  // Obtener el mes actual
+  const currentMonth = new Date().getUTCMonth() + 1;
+  // Recorrer todos los datos
+  let thisMonthEgress = egress.filter((element) => {
+    const month = new Date(element._id).getUTCMonth() + 1;
+    return month === currentMonth;
+  });
+
+  let thisMonthExtra = extra.filter((element) => {
+    const month = new Date(element._id).getUTCMonth() + 1;
+    return month === currentMonth;
+  });
+  // Unir datos
+  const data = thisMonthEgress.concat(thisMonthExtra);
   // Sacar el total de los extras
   const totalExtra = totalFunction(thisMonthExtra);
 
@@ -142,5 +177,6 @@ module.exports = {
   getDataLastThreeMonths,
   getPercentage,
   verifyDataForPercentage,
-  getDataCurrentMonth,
+  getDataCurrentMonthEgress,
+  getDataCurrentMonthIngress,
 };

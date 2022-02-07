@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const route = express.Router();
 const InventoryEntry = require("../../db/Models/Inventory/InventoryEntry");
 const Sales = require("../../db/Models/Inventory/Sale");
@@ -9,8 +10,9 @@ const { total } = require("../../scripts/total");
 const {
   getDataLastThreeMonths,
   verifyDataForPercentage,
+  getDataCurrentMonthEgress,
 } = require("../../scripts/statistics");
-const { log } = require("console");
+const val = mongoose.Types.ObjectId("61dc6d180dea196d5fdf0bf4");
 
 route.get("/", async (req, res) => {
   try {
@@ -30,7 +32,28 @@ route.get("/", async (req, res) => {
         },
         {
           $group: {
-            _id: "$date",
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            total: { $sum: "$total" },
+          },
+        },
+        {
+          $sort: { _id: 1 },
+        },
+      ]);
+      // Obtener los movimientos extra
+      extraMoves = await ExtraMove.aggregate([
+        {
+          $match: {
+            date: {
+              $gte: new Date(req.query.startDate),
+              $lte: new Date(req.query.endDate),
+            },
+            type_move: val,
+          },
+        },
+        {
+          $group: {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
             total: { $sum: "$total" },
           },
         },
@@ -43,7 +66,24 @@ route.get("/", async (req, res) => {
       inventoryEntries = await InventoryEntry.aggregate([
         {
           $group: {
-            _id: "$date",
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            total: { $sum: "$total" },
+          },
+        },
+        {
+          $sort: { _id: 1 },
+        },
+      ]);
+      // Obtener extraMoves donde la fecha sea igual a la fecha de venta y sea de tipo ingreso
+      extraMoves = await ExtraMove.aggregate([
+        {
+          $match: {
+            type_move: val,
+          },
+        },
+        {
+          $group: {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
             total: { $sum: "$total" },
           },
         },
@@ -53,23 +93,50 @@ route.get("/", async (req, res) => {
       ]);
     }
 
+    // Obtiene los datos del mes actual
+    const currentMonth = getDataCurrentMonthEgress(
+      inventoryEntries,
+      extraMoves
+    );
     // Graficar datos
     const inventoryEntriesGraphic = graphic(inventoryEntries);
+    const extraMovesGraphic = graphic(extraMoves);
+
+    // Verificar que son arrays
+    if (!Array.isArray(inventoryEntries)) {
+      const pivot = sales;
+      sales = [];
+      sales.push(pivot);
+    }
+    if (!Array.isArray(extraMoves)) {
+      const pivot = extraMoves;
+      extraMoves = [];
+      extraMoves.push(pivot);
+    }
 
     // Obtener los salarios y formatearlo
 
-    // Obtener los gastos extras y formatearlo
-
     // Obtener totales
-    const totalInventoryProducts = total(inventoryEntries);
-    // Redondear a dos decimales
-    const totalGeneral = Math.round(totalInventoryProducts * 100) / 100;
+    const totalInventoryEntries = parseFloat(total(inventoryEntries));
+    const totalExtraMoves = parseFloat(total(extraMoves));
+
+    // Obtener total general
+    let totalGeneral = totalInventoryEntries + totalExtraMoves;
+    const totalGeneralFormat = totalGeneral.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
 
     // Asignar fecha de inicio y fin
-    const inventoryProductsDates = checkDates(
+    const inventoryEntriesDates = checkDates(
       req.query.startDate,
       req.query.endDate,
       inventoryEntries
+    );
+    const extraMovesDates = checkDates(
+      req.query.startDate,
+      req.query.endDate,
+      extraMoves
     );
     /*const salariesDates = checkDates(
       req.query.startDate,
@@ -78,24 +145,36 @@ route.get("/", async (req, res) => {
     );*/
 
     // Obtener datos estadisticos
-    const statisticsThreeMonths = getDataLastThreeMonths(inventoryEntries);
+    const statisticsThreeMonths = getDataLastThreeMonths(
+      inventoryEntries.concat(extraMoves)
+    );
     // Obtiene el porcentaje de incremento o decremento
     const percentageIncDec = verifyDataForPercentage(statisticsThreeMonths);
     const response = {
       general: {
-        total: totalGeneral,
-        statisticsInventoryEntries: statisticsThreeMonths,
+        totalCurrentMonth: currentMonth.total,
+        totalCurrentMonthFormat: currentMonth.total_format,
+        extraPercentage: currentMonth.extra_percentage,
+        extraPercentageFormat: currentMonth.extra_percentage_format,
+        totalAll: totalGeneral,
+        totalAllFormat: totalGeneralFormat,
+        statisticsEgressThreeMonths: statisticsThreeMonths,
         percentageIncDec,
       },
-      inventoryProducts: {
+      inventoryEntries: {
         graphic: inventoryEntriesGraphic,
-        total: totalInventoryProducts,
-        startDate: inventoryProductsDates.startDate,
-        endDate: inventoryProductsDates.endDate,
-        filtered: inventoryProductsDates.filtered,
+        total: totalInventoryEntries,
+        startDate: inventoryEntriesDates.startDate,
+        endDate: inventoryEntriesDates.endDate,
+        filtered: inventoryEntriesDates.filtered,
       },
-      salaries: {},
-      extraMoves: {},
+      extraMoves: {
+        graphic: extraMovesGraphic,
+        total: totalExtraMoves,
+        startDate: extraMovesDates.startDate,
+        endDate: extraMovesDates.endDate,
+        filtered: extraMovesDates.filtered,
+      },
     };
 
     return res.status(200).json(response);
