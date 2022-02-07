@@ -224,6 +224,20 @@ const totalFunction = (data) => {
   return { total, total_format };
 };
 
+const maxAndMin = (data) => {
+  let max = {};
+  let min = {};
+  data.forEach((element) => {
+    if (!max.total || max.total < element.total) {
+      max = element;
+    }
+    if (!min.total || min.total > element.total) {
+      min = element;
+    }
+  });
+  return { max, min };
+};
+
 module.exports = {
   getDataLastThreeMonths,
   getPercentage,
@@ -232,4 +246,5 @@ module.exports = {
   getDataRangeEgress,
   getDataCurrentMonthIngress,
   getDataRangeIngress,
+  maxAndMin,
 };

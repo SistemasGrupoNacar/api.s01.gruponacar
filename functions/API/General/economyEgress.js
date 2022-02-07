@@ -12,6 +12,7 @@ const {
   verifyDataForPercentage,
   getDataCurrentMonthEgress,
   getDataRangeEgress,
+  maxAndMin,
 } = require("../../scripts/statistics");
 const val = mongoose.Types.ObjectId("61dc6d180dea196d5fdf0bf4");
 
@@ -123,6 +124,10 @@ route.get("/", async (req, res) => {
     const totalInventoryEntries = parseFloat(total(inventoryEntries));
     const totalExtraMoves = parseFloat(total(extraMoves));
 
+    // Obtener maximos y minimos
+    const maxAndMinInventoryEntries = maxAndMin(inventoryEntries);
+    const maxAndMinExtraMoves = maxAndMin(extraMoves);
+
     // Obtener total general
     let totalGeneral = totalInventoryEntries + totalExtraMoves;
     const totalGeneralFormat = totalGeneral.toLocaleString("en-US", {
@@ -167,6 +172,8 @@ route.get("/", async (req, res) => {
       inventoryEntries: {
         graphic: inventoryEntriesGraphic,
         total: totalInventoryEntries,
+        max: maxAndMinInventoryEntries.max,
+        min: maxAndMinInventoryEntries.min,
         startDate: inventoryEntriesDates.startDate,
         endDate: inventoryEntriesDates.endDate,
         filtered: inventoryEntriesDates.filtered,
@@ -174,6 +181,8 @@ route.get("/", async (req, res) => {
       extraMoves: {
         graphic: extraMovesGraphic,
         total: totalExtraMoves,
+        max: maxAndMinExtraMoves.max,
+        min: maxAndMinExtraMoves.min,
         startDate: extraMovesDates.startDate,
         endDate: extraMovesDates.endDate,
         filtered: extraMovesDates.filtered,

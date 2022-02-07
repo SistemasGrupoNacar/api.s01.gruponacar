@@ -128,6 +128,10 @@ route.get("/", async (req, res) => {
     const totalSales = parseFloat(total(sales));
     const totalExtraMoves = parseFloat(total(extraMoves));
 
+    // Obtener dias de maximo y minimo
+    const maxAndMinSales = maxAndMin(sales);
+    const maxAndMinExtraMoves = maxAndMin(extraMoves);
+
     // Obtener total general
     let totalGeneral = totalSales + totalExtraMoves;
     const totalGeneralFormat = totalGeneral.toLocaleString("en-US", {
@@ -170,6 +174,8 @@ route.get("/", async (req, res) => {
       sales: {
         graphic: salesGraphic,
         total: totalSales,
+        max: maxAndMinSales.max,
+        min: maxAndMinSales.min,
         startDate: salesDates.startDate,
         endDate: salesDates.endDate,
         filtered: salesDates.filtered,
@@ -177,6 +183,8 @@ route.get("/", async (req, res) => {
       extraMoves: {
         graphic: extraMovesGraphic,
         total: totalExtraMoves,
+        max: maxAndMinExtraMoves.max,
+        min: maxAndMinExtraMoves.min,
         startDate: extraMovesDates.startDate,
         endDate: extraMovesDates.endDate,
         filtered: extraMovesDates.filtered,
