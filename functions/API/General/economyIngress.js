@@ -129,9 +129,6 @@ route.get("/", async (req, res) => {
     const totalSales = parseFloat(total(sales));
     const totalExtraMoves = parseFloat(total(extraMoves));
 
-    // Obtener dias de maximo y minimo
-    const maxAndMinSales = maxAndMin(sales);
-    const maxAndMinExtraMoves = maxAndMin(extraMoves);
 
     // Obtener total general
     let totalGeneral = totalSales + totalExtraMoves;
@@ -139,7 +136,6 @@ route.get("/", async (req, res) => {
       style: "currency",
       currency: "USD",
     });
-
     // Asignar fecha de inicio y fin
     const salesDates = checkDates(
       req.query.startDate,
@@ -152,6 +148,9 @@ route.get("/", async (req, res) => {
       req.query.endDate,
       extraMoves
     );
+    // Obtener dias de maximo y minimo
+    const maxAndMinSales = maxAndMin(sales);
+    const maxAndMinExtraMoves = maxAndMin(extraMoves);
 
     // Obtener datos estadísticos
     const statisticsThreeMonths = getDataLastThreeMonths(
