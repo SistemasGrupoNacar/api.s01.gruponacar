@@ -7,4 +7,17 @@ const total = (data) => {
     .toFixed(2);
 };
 
-module.exports = { total };
+// Redondea a dos decimales
+const round = (num) => {
+  return Math.round(num * 100) / 100;
+};
+
+// Convierte el numero a moneda dolar
+const toDolar = (num) => {
+  return num.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+};
+
+module.exports = { total, round, toDolar };

@@ -1,4 +1,5 @@
 const { setDefaultResultOrder } = require("dns");
+const { toDolar, round } = require("../scripts/total");
 
 // Obtiene los datos de los ultimos 3 meses
 const getDataLastThreeMonths = (data) => {
@@ -39,6 +40,7 @@ const getDataLastThreeMonths = (data) => {
       }
     }
   });
+  lastThreeMonths = formatData(lastThreeMonths);
   return lastThreeMonths;
 };
 
@@ -46,6 +48,15 @@ const getDataLastThreeMonths = (data) => {
 const getPercentage = (current, previous) => {
   const percentage = ((current - previous) / previous) * 100;
   return Math.round(percentage);
+};
+
+// Recorre el array y le aplica el formato de moneda y redondeo
+const formatData = (data) => {
+  data.forEach((element) => {
+    element.total_format = toDolar(element.total);
+    element.total = round(element.total);
+  });
+  return data;
 };
 
 // Ordena y verifica el porcentaje de incremento
@@ -128,7 +139,7 @@ const getDataCurrentMonthIngress = (sales, extra) => {
 };
 // Obtiene los datos del rango de fecha dado
 const getDataRangeIngress = (sales, extra) => {
-  const joined = sales.concat(extra);
+  let joined = sales.concat(extra);
   // Sacar el total de los extras
   const totalExtra = totalFunction(extra);
 
@@ -137,7 +148,7 @@ const getDataRangeIngress = (sales, extra) => {
   // Calcular el porcentaje del total que corresponde a movimientos extra redondeado a dos decimales
   const percentage = (totalExtra.total / total) * 100;
   const percentage_format = percentage.toFixed(2);
-
+  joined = formatData(joined);
   return {
     joined,
     total,
@@ -148,7 +159,7 @@ const getDataRangeIngress = (sales, extra) => {
 };
 // Obtiene los datos del rango de fecha dado
 const getDataRangeEgress = (inventoryEntries, extra) => {
-  const joined = inventoryEntries.concat(extra);
+  let joined = inventoryEntries.concat(extra);
   // Sacar el total de los extras
   const totalExtra = totalFunction(extra);
 
@@ -157,7 +168,7 @@ const getDataRangeEgress = (inventoryEntries, extra) => {
   // Calcular el porcentaje del total que corresponde a movimientos extra redondeado a dos decimales
   const percentage = (totalExtra.total / total) * 100;
   const percentage_format = percentage.toFixed(2);
-
+  joined = formatData(joined);
   return {
     joined,
     total,
