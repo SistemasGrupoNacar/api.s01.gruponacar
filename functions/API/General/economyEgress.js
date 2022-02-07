@@ -172,8 +172,8 @@ route.get("/", async (req, res) => {
       inventoryEntries: {
         graphic: inventoryEntriesGraphic,
         total: totalInventoryEntries,
-        max: maxAndMinInventoryEntries.max,
-        min: maxAndMinInventoryEntries.min,
+        max: maxAndMinInventoryEntries.max._id,
+        min: maxAndMinInventoryEntries.min._id,
         startDate: inventoryEntriesDates.startDate,
         endDate: inventoryEntriesDates.endDate,
         filtered: inventoryEntriesDates.filtered,
@@ -181,8 +181,8 @@ route.get("/", async (req, res) => {
       extraMoves: {
         graphic: extraMovesGraphic,
         total: totalExtraMoves,
-        max: maxAndMinExtraMoves.max,
-        min: maxAndMinExtraMoves.min,
+        max: maxAndMinExtraMoves.max._id,
+        min: maxAndMinExtraMoves.min._id,
         startDate: extraMovesDates.startDate,
         endDate: extraMovesDates.endDate,
         filtered: extraMovesDates.filtered,

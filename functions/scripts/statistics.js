@@ -235,6 +235,11 @@ const maxAndMin = (data) => {
       min = element;
     }
   });
+  // Formatear el id de fecha a local
+
+  var options = { year: "numeric", month: "long", day: "numeric" };
+  max._id = new Date(max._id).toLocaleDateString("es-ES", options);
+  min._id = new Date(min._id).toLocaleDateString("es-ES", options);
   return { max, min };
 };
 

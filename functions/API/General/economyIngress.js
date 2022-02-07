@@ -10,6 +10,7 @@ const {
   verifyDataForPercentage,
   getDataCurrentMonthIngress,
   getDataRangeIngress,
+  maxAndMin,
 } = require("../../scripts/statistics");
 const ExtraMove = require("../../db/Models/General/ExtraMove");
 // Se declara el valor del tipo de movimiento para ingresos
@@ -174,8 +175,8 @@ route.get("/", async (req, res) => {
       sales: {
         graphic: salesGraphic,
         total: totalSales,
-        max: maxAndMinSales.max,
-        min: maxAndMinSales.min,
+        max: maxAndMinSales.max._id,
+        min: maxAndMinSales.min._id,
         startDate: salesDates.startDate,
         endDate: salesDates.endDate,
         filtered: salesDates.filtered,
@@ -183,8 +184,8 @@ route.get("/", async (req, res) => {
       extraMoves: {
         graphic: extraMovesGraphic,
         total: totalExtraMoves,
-        max: maxAndMinExtraMoves.max,
-        min: maxAndMinExtraMoves.min,
+        max: maxAndMinExtraMoves.max._id,
+        min: maxAndMinExtraMoves.min._id,
         startDate: extraMovesDates.startDate,
         endDate: extraMovesDates.endDate,
         filtered: extraMovesDates.filtered,
