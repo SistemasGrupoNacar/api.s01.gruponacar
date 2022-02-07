@@ -9,6 +9,7 @@ const {
   getDataLastThreeMonths,
   verifyDataForPercentage,
   getDataCurrentMonthIngress,
+  getDataRangeIngress,
 } = require("../../scripts/statistics");
 const ExtraMove = require("../../db/Models/General/ExtraMove");
 // Se declara el valor del tipo de movimiento para ingresos
@@ -17,6 +18,7 @@ route.get("/", async (req, res) => {
   try {
     let sales;
     let extraMoves;
+    const filteredQuery = req.query.startDate ? true : false;
     // Verificando si consulta rangos de fechas
     if (req.query.startDate && req.query.endDate) {
       // Obtener las ventas y formatearlo con el rango de fecha dado
@@ -98,8 +100,14 @@ route.get("/", async (req, res) => {
         },
       ]);
     }
-    // Obtiene los datos del mes actual
-    const currentMonth = getDataCurrentMonthIngress(sales, extraMoves);
+    let currentMonth;
+    if (!filteredQuery) {
+      // Obtiene los datos del mes actual
+      currentMonth = getDataCurrentMonthIngress(sales, extraMoves);
+    } else {
+      currentMonth = getDataRangeIngress(sales, extraMoves);
+    }
+
     // Graficar los datos
     const salesGraphic = graphic(sales);
     const extraMovesGraphic = graphic(extraMoves);

@@ -11,13 +11,14 @@ const {
   getDataLastThreeMonths,
   verifyDataForPercentage,
   getDataCurrentMonthEgress,
+  getDataRangeEgress,
 } = require("../../scripts/statistics");
 const val = mongoose.Types.ObjectId("61dc6d180dea196d5fdf0bf4");
 
 route.get("/", async (req, res) => {
   try {
     let inventoryEntries;
-
+    const filteredQuery = req.query.startDate ? true : false;
     // Verificando si consulta por rango de fechas
     if (req.query.startDate && req.query.endDate) {
       // Obtener las entradas de insumos y formatearlo con el rango de fecha dado
@@ -92,12 +93,14 @@ route.get("/", async (req, res) => {
         },
       ]);
     }
-
-    // Obtiene los datos del mes actual
-    const currentMonth = getDataCurrentMonthEgress(
-      inventoryEntries,
-      extraMoves
-    );
+    let currentMonth;
+    if (!filteredQuery) {
+      // Obtiene los datos del mes actual
+      currentMonth = getDataCurrentMonthEgress(inventoryEntries, extraMoves);
+    } else {
+      // Obtiene los datos del rango de fecha dado
+      currentMonth = getDataRangeEgress(inventoryEntries, extraMoves);
+    }
     // Graficar datos
     const inventoryEntriesGraphic = graphic(inventoryEntries);
     const extraMovesGraphic = graphic(extraMoves);

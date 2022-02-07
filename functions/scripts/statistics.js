@@ -1,3 +1,5 @@
+const { setDefaultResultOrder } = require("dns");
+
 // Obtiene los datos de los ultimos 3 meses
 const getDataLastThreeMonths = (data) => {
   // Declaracion de variables
@@ -124,7 +126,46 @@ const getDataCurrentMonthIngress = (sales, extra) => {
     extra_percentage_format: percentage_format,
   };
 };
+// Obtiene los datos del rango de fecha dado
+const getDataRangeIngress = (sales, extra) => {
+  const joined = sales.concat(extra);
+  // Sacar el total de los extras
+  const totalExtra = totalFunction(extra);
 
+  // Calcular total del mes
+  const { total, total_format } = totalFunction(joined);
+  // Calcular el porcentaje del total que corresponde a movimientos extra redondeado a dos decimales
+  const percentage = (totalExtra.total / total) * 100;
+  const percentage_format = percentage.toFixed(2);
+
+  return {
+    joined,
+    total,
+    total_format,
+    extra_percentage: percentage,
+    extra_percentage_format: percentage_format,
+  };
+};
+// Obtiene los datos del rango de fecha dado
+const getDataRangeEgress = (inventoryEntries, extra) => {
+  const joined = inventoryEntries.concat(extra);
+  // Sacar el total de los extras
+  const totalExtra = totalFunction(extra);
+
+  // Calcular total del mes
+  const { total, total_format } = totalFunction(joined);
+  // Calcular el porcentaje del total que corresponde a movimientos extra redondeado a dos decimales
+  const percentage = (totalExtra.total / total) * 100;
+  const percentage_format = percentage.toFixed(2);
+
+  return {
+    joined,
+    total,
+    total_format,
+    extra_percentage: percentage,
+    extra_percentage_format: percentage_format,
+  };
+};
 // Obtiene los datos del mes actual en egresos
 const getDataCurrentMonthEgress = (egress, extra) => {
   // Obtener el mes actual
@@ -146,7 +187,6 @@ const getDataCurrentMonthEgress = (egress, extra) => {
 
   // Calcular total del mes
   const { total, total_format } = totalFunction(data);
-
   // Calcular el porcentaje del total que corresponde a movimientos extra redondeado a dos decimales
   const percentage = (totalExtra.total / total) * 100;
   const percentage_format = percentage.toFixed(2);
@@ -178,5 +218,7 @@ module.exports = {
   getPercentage,
   verifyDataForPercentage,
   getDataCurrentMonthEgress,
+  getDataRangeEgress,
   getDataCurrentMonthIngress,
+  getDataRangeIngress,
 };
