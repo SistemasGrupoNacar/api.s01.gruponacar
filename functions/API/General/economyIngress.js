@@ -129,7 +129,6 @@ route.get("/", async (req, res) => {
     const totalSales = parseFloat(total(sales));
     const totalExtraMoves = parseFloat(total(extraMoves));
 
-
     // Obtener total general
     let totalGeneral = totalSales + totalExtraMoves;
     const totalGeneralFormat = totalGeneral.toLocaleString("en-US", {
@@ -148,15 +147,15 @@ route.get("/", async (req, res) => {
       req.query.endDate,
       extraMoves
     );
-    // Obtener dias de maximo y minimo
-    const maxAndMinSales = maxAndMin(sales);
-    const maxAndMinExtraMoves = maxAndMin(extraMoves);
 
     // Obtener datos estadísticos
     const statisticsThreeMonths = getDataLastThreeMonths(
       sales.concat(extraMoves)
     );
 
+    // Obtener dias de maximo y minimo
+    const maxAndMinSales = maxAndMin(sales);
+    const maxAndMinExtraMoves = maxAndMin(extraMoves);
     // Obtiene el porcentaje de incremento o decremento
     const percentageIncDec = verifyDataForPercentage(statisticsThreeMonths);
 

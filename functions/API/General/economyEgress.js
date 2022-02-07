@@ -147,13 +147,14 @@ route.get("/", async (req, res) => {
       req.query.endDate,
       salaries
     );*/
-    // Obtener maximos y minimos
-    const maxAndMinInventoryEntries = maxAndMin(inventoryEntries);
-    const maxAndMinExtraMoves = maxAndMin(extraMoves);
     // Obtener datos estadisticos
     const statisticsThreeMonths = getDataLastThreeMonths(
       inventoryEntries.concat(extraMoves)
     );
+    
+    // Obtener maximos y minimos
+    const maxAndMinInventoryEntries = maxAndMin(inventoryEntries);
+    const maxAndMinExtraMoves = maxAndMin(extraMoves);
     // Obtiene el porcentaje de incremento o decremento
     const percentageIncDec = verifyDataForPercentage(statisticsThreeMonths);
     const response = {
