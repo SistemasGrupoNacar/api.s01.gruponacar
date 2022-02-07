@@ -124,10 +124,6 @@ route.get("/", async (req, res) => {
     const totalInventoryEntries = parseFloat(total(inventoryEntries));
     const totalExtraMoves = parseFloat(total(extraMoves));
 
-    // Obtener maximos y minimos
-    const maxAndMinInventoryEntries = maxAndMin(inventoryEntries);
-    const maxAndMinExtraMoves = maxAndMin(extraMoves);
-
     // Obtener total general
     let totalGeneral = totalInventoryEntries + totalExtraMoves;
     const totalGeneralFormat = totalGeneral.toLocaleString("en-US", {
@@ -151,7 +147,9 @@ route.get("/", async (req, res) => {
       req.query.endDate,
       salaries
     );*/
-
+    // Obtener maximos y minimos
+    const maxAndMinInventoryEntries = maxAndMin(inventoryEntries);
+    const maxAndMinExtraMoves = maxAndMin(extraMoves);
     // Obtener datos estadisticos
     const statisticsThreeMonths = getDataLastThreeMonths(
       inventoryEntries.concat(extraMoves)
