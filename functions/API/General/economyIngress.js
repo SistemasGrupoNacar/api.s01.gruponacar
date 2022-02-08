@@ -177,6 +177,8 @@ route.get("/", async (req, res) => {
         min: maxAndMinSales.min._id,
         startDate: salesDates.startDate,
         endDate: salesDates.endDate,
+        startDateFormat: salesDates.startDateFormat,
+        endDateFormat: salesDates.endDateFormat,
         filtered: salesDates.filtered,
       },
       extraMoves: {
@@ -186,6 +188,8 @@ route.get("/", async (req, res) => {
         min: maxAndMinExtraMoves.min._id,
         startDate: extraMovesDates.startDate,
         endDate: extraMovesDates.endDate,
+        startDateFormat: extraMovesDates.startDateFormat,
+        endDateFormat: extraMovesDates.endDateFormat,
         filtered: extraMovesDates.filtered,
       },
     };

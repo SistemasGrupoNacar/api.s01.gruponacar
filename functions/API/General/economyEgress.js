@@ -151,7 +151,7 @@ route.get("/", async (req, res) => {
     const statisticsThreeMonths = getDataLastThreeMonths(
       inventoryEntries.concat(extraMoves)
     );
-    
+
     // Obtener maximos y minimos
     const maxAndMinInventoryEntries = maxAndMin(inventoryEntries);
     const maxAndMinExtraMoves = maxAndMin(extraMoves);
@@ -175,6 +175,8 @@ route.get("/", async (req, res) => {
         min: maxAndMinInventoryEntries.min._id,
         startDate: inventoryEntriesDates.startDate,
         endDate: inventoryEntriesDates.endDate,
+        startDateFormat: inventoryEntriesDates.startDateFormat,
+        endDateFormat: inventoryEntriesDates.endDateFormat,
         filtered: inventoryEntriesDates.filtered,
       },
       extraMoves: {
@@ -184,6 +186,8 @@ route.get("/", async (req, res) => {
         min: maxAndMinExtraMoves.min._id,
         startDate: extraMovesDates.startDate,
         endDate: extraMovesDates.endDate,
+        startDateFormat: extraMovesDates.startDateFormat,
+        endDateFormat: extraMovesDates.endDateFormat,
         filtered: extraMovesDates.filtered,
       },
     };
