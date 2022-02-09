@@ -5,6 +5,14 @@ const User = require("../../db/Models/General/User");
 const { body } = require("express-validator");
 const { comparePassword } = require("../../scripts/encrypt");
 const { setToken } = require("../../middleware/auth");
+let { authenticateToken } = require("../../middleware/auth");
+
+//ruta para verificar el token
+route.get("/", authenticateToken, async (req, res) => {
+  return res.status(200).json({
+    message: "Token correcto",
+  });
+});
 
 route.post(
   "/",
