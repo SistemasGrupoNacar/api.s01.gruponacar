@@ -28,5 +28,6 @@ app.use("/extraMoves", require("./API/General/extraMoves"));
 app.use("/inventoryEntries", require("./API/Inventory/inventoryEntries"));
 app.use("/economy/egress", require("./API/General/economyEgress"));
 app.use("/economy/ingress", require("./API/General/economyIngress"));
+app.use("/panel", require("./API/General/panel"));
 
 exports.api = functions.https.onRequest(app);

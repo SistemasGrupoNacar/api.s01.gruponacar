@@ -252,4 +252,5 @@ module.exports = {
   getDataCurrentMonthIngress,
   getDataRangeIngress,
   maxAndMin,
+  getMonthName,
 };
