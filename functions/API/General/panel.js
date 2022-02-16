@@ -5,6 +5,7 @@ const axios = require("axios");
 const Sales = require("../../db/Models/Inventory/Sale");
 const InventoryEntry = require("../../db/Models/Inventory/InventoryEntry");
 const ExtraMove = require("../../db/Models/General/ExtraMove");
+const InventoryProduct = require("../../db/Models/Inventory/InventoryProduct");
 const URL_SERVER = "https://us-central1-s01-gruponacar.cloudfunctions.net/api";
 const ID_EGRESS = mongoose.Types.ObjectId("61dc6d180dea196d5fdf0bf4");
 const ID_INGRESS = mongoose.Types.ObjectId("61dc6d250dea196d5fdf0bf7");
@@ -18,10 +19,14 @@ route.get("/", async (req, res) => {
   const responseEgress = await getEgress();
   const responseIngress = await getIngress();
 
+  // Obtiene los datos de egresos e ingresos
   egressMonth = responseEgress;
   ingressMonth = responseIngress;
+  //Obtener los productos que tienen bajo stock
+  const productsWithLessStock = await getProductsWithLessStock();
 
   const response = {
+    productsWithLessStock,
     graphic: [
       {
         name: "Ingresos",
@@ -35,6 +40,22 @@ route.get("/", async (req, res) => {
   };
   res.status(200).json(response);
 });
+
+const getProductsWithLessStock = async () => {
+  // Obtener los productos que su stock sea menor o igual que el min_stock
+  const products = await InventoryProduct.find();
+  const productsWithLessStock = [];
+  products.forEach((element) => {
+    if (element.stock <= element.min_stock) {
+      productsWithLessStock.push(element);
+    }
+  });
+  if (productsWithLessStock.length <= 0) {
+    return null;
+  } else {
+    return productsWithLessStock;
+  }
+};
 
 const getEgress = async () => {
   // Obtener las entradas de insumos y formatearlo
