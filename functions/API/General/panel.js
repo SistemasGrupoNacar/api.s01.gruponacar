@@ -146,7 +146,7 @@ const getObjectTotalMonth = (data, monthGet, yearGet) => {
   total = totalFormat.round(total);
   const monthName = statistics.getMonthName(monthGet + 1);
   return {
-    month: monthName + " " + yearGet,
+    month: monthName + "-" + yearGet.toString().slice(2, 4),
     total,
   };
 };
