@@ -16,6 +16,7 @@ const sale = new mongoose.Schema(
     },
     description: {
       type: String,
+      default: "",
     },
     detail_sale: [
       {
@@ -25,6 +26,7 @@ const sale = new mongoose.Schema(
     ],
     total: {
       type: Number,
+      default: 0,
     },
   },
   {
