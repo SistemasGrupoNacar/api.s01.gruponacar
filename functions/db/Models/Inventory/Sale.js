@@ -6,6 +6,10 @@ const sale = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    pending: {
+      type: Boolean,
+      default: true,
+    },
     status: {
       type: Boolean,
       required: true,

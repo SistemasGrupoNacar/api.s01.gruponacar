@@ -25,8 +25,12 @@ route.get("/", async (req, res) => {
   //Obtener los productos que tienen bajo stock
   const productsWithLessStock = await getProductsWithLessStock();
 
+  // Obtener los datos de ventas que estan pendientes
+  const salesPending = await Sales.find({ pending: true }, { _id: 1, date: 1 });
+
   const response = {
     productsWithLessStock,
+    salesPending,
     graphic: [
       {
         name: "Ingresos",

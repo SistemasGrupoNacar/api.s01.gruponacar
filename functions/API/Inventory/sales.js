@@ -16,7 +16,7 @@ route.get("/", async (req, res) => {
       let limit = parseInt(req.query.limit);
       // Las que tengan status true
       sale = await Sale.find({ status: true })
-        .sort({ _id: 1 })
+        .sort({ date: -1 })
         .populate({
           path: "detail_sale",
           populate: { path: "product", select: "name" },
@@ -25,7 +25,7 @@ route.get("/", async (req, res) => {
         .limit(limit);
     } else {
       sale = await Sale.find({ status: true })
-        .sort({ _id: 1 })
+        .sort({ date: -1 })
         .populate({
           path: "detail_sale",
           populate: { path: "product", select: "name" },
@@ -33,6 +33,19 @@ route.get("/", async (req, res) => {
         });
     }
 
+    return res.status(200).json(sale);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
+
+// Obtener las ventas pendientes
+route.get("/pending", async (req, res) => {
+  try {
+    const sale = await Sale.find({ pending: true }).sort({ date: -1 });
     return res.status(200).json(sale);
   } catch (error) {
     return res.status(500).json({
@@ -51,7 +64,7 @@ route.get("/all", async (req, res) => {
       let limit = parseInt(req.query.limit);
       // Las que tengan status true
       sale = await Sale.find({})
-        .sort({ _id: 1 })
+        .sort({ date: -1 })
         .populate({
           path: "detail_sale",
           populate: { path: "product", select: "name" },
@@ -61,7 +74,7 @@ route.get("/all", async (req, res) => {
     } else {
       // Las que tengan status true
       sale = await Sale.find({})
-        .sort({ _id: 1 })
+        .sort({ date: -1 })
         .populate({
           path: "detail_sale",
           populate: { path: "product", select: "name" },
@@ -107,7 +120,7 @@ route.get("/:startDate/:endDate", async (req, res) => {
       },
       status: true,
     })
-      .sort({ _id: 1 })
+      .sort({ date: -1 })
       .populate({
         path: "detail_sale",
         populate: { path: "product", select: "name" },
@@ -142,7 +155,7 @@ route.get("/:startDate/:endDate/all", async (req, res) => {
         $lte: endDate,
       },
     })
-      .sort({ _id: 1 })
+      .sort({ date: -1 })
       .populate({
         path: "detail_sale",
         populate: { path: "product", select: "name" },
@@ -218,6 +231,28 @@ route.put(
   }
 );
 
+// Cambiar el estado pendiente de una venta
+route.put(
+  "/pending/:id/:status",
+  param("status").isBoolean().withMessage("Estado no es válido"),
+  async (req, res) => {
+    try {
+      const { id, status } = req.params;
+      const response = await Sale.findByIdAndUpdate(
+        id,
+        { pending: status },
+        { new: true }
+      );
+      return res.status(200).json(response);
+    } catch (error) {
+      return res.status(500).json({
+        name: error.name,
+        message: error.message,
+      });
+    }
+  }
+);
+
 route.delete("/:id", async (req, res) => {
   try {
     const sale = await Sale.findById(req.params.id);
@@ -246,6 +281,7 @@ route.delete("/:id", async (req, res) => {
     if (sale.detail_sale.length > 0) {
       const response = await Sale.findByIdAndUpdate(req.params.id, {
         status: false,
+        pending: false,
       });
       return res.status(200).json(response);
     } else {
