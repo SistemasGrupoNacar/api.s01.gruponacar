@@ -190,7 +190,6 @@ route.post(
       return res.status(422).json({ errors: errors.array() });
     }
     const { date, description } = req.body;
-
     const sale = new Sale({
       description,
       date,
