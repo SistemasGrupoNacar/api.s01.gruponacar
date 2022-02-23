@@ -42,6 +42,33 @@ route.get("/", async (req, res) => {
   }
 });
 
+// Obtener las ventas de hoy
+route.get("/today", async (req, res) => {
+  try {
+    const today = new Date();
+    const todayNow = today.toISOString();
+    const todayZeroHours = new Date(today.setHours(0, 0, 0, 0)).toISOString();
+    const sales = await Sale.find({
+      date: {
+        $lte: todayNow,
+        $gte: todayZeroHours,
+      },
+    })
+      .populate({
+        path: "detail_sale",
+        populate: { path: "product", select: "name" },
+        select: "quantity sub_total total production",
+      })
+      .sort({ date: -1 });
+    return res.status(200).json(sales);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
+
 // Obtener las ventas pendientes
 route.get("/pending", async (req, res) => {
   try {
