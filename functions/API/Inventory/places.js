@@ -41,14 +41,21 @@ route.post(
 
 route.put("/:id/:availability", async (req, res) => {
   errors.validationErrorResponse(req, res);
-  const response = await Place.findByIdAndUpdate(
-    req.params.id,
-    {
-      availability: req.params.availability,
-    },
-    { new: true }
-  );
-  return res.status(200).json(response);
+  try {
+    const response = await Place.findByIdAndUpdate(
+      req.params.id,
+      {
+        availability: req.params.availability,
+      },
+      { new: true }
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
 });
 
 route.put("/:id", async (req, res) => {
