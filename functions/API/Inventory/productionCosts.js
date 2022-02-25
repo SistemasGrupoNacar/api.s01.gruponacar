@@ -103,6 +103,13 @@ route.post(
           message: "El producto no existe",
         });
       }
+      // Verifica si hay suficiente insumo
+      if (inventoryProduct.quantity < quantity) {
+        return res.status(400).json({
+          name: "Insuficiente insumo",
+          message: "No hay suficiente insumo",
+        });
+      }
       
 
       // Asigna los valores de precio unitario y total dependiendo de lo que marque el producto en inventario
