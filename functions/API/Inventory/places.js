@@ -1,6 +1,7 @@
 const express = require("express");
 const route = express.Router();
 const Place = require("../../db/Models/Inventory/Place");
+const Production = require("../../db/Models/Inventory/Production");
 const { body } = require("express-validator");
 const { errors } = require("../../middleware/errors");
 
@@ -72,7 +73,22 @@ route.put("/:id", async (req, res) => {
 });
 
 route.delete("/:id", async (req, res) => {
-  const response = await Place.findByIdAndDelete(req.params.id);
-  return res.status(200).json(response);
+  try {
+    // Primero verifica si el lugar no se esta ocupando en alguna produccion
+    const productions = await Production.find({ place: req.params.id });
+    if (productions.length > 0) {
+      return res.status(400).json({
+        message: "El lugar se encuentra ocupado en alguna produccion",
+      });
+    }
+    // Si no esta ocupado, elimina el lugar
+    const response = await Place.findByIdAndDelete(req.params.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
 });
 module.exports = route;
