@@ -31,4 +31,10 @@ app.use("/economy/ingress", require("./API/General/economyIngress"));
 app.use("/panel", require("./API/General/panel"));
 app.use("/test", require("./API/General/test"));
 
+// Control API
+app.use("/positions", require("./API/Control/positions"));
+app.use("/employees", require("./API/Control/employees"));
+app.use("/journeys", require("./API/Control/journeys"));
+app.use("/salaries", require("./API/Control/salaries"));
+
 exports.api = functions.https.onRequest(app);

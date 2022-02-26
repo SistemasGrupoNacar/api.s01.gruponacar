@@ -19,6 +19,12 @@ route.get("/", async (req, res) => {
       unit_price: 1,
       status: 1,
     })
+    .populate("salaries", {
+      employee: 1,
+      date: 1,
+      amount: 1,
+      _id: 0,
+    })
     .populate("harvest", { quantity: 1, date: 1, description: 1 });
   return res.status(200).json(productions);
 });
@@ -38,6 +44,12 @@ route.get("/all", async (req, res) => {
       unit_price: 1,
       status: 1,
     })
+    .populate("salaries", {
+      employee: 1,
+      date: 1,
+      amount: 1,
+      _id: 0,
+    })
     .populate("harvest", { quantity: 1, date: 1, description: 1 });
   return res.status(200).json(productions);
 });
@@ -55,6 +67,12 @@ route.get("/start/:startDate/:endDate", async (req, res) => {
       .populate("place", { description: 1, _id: 0 })
       .populate("product", { name: 1, _id: 0 })
       .populate("detail_sales", { _id: 1, quantity: 1, sub_total: 1, total: 1 })
+      .populate("salaries", {
+        employee: 1,
+        date: 1,
+        amount: 1,
+        _id: 0,
+      })
       .populate("production_costs", {
         description: 1,
         date: 1,
@@ -86,6 +104,12 @@ route.get("/end/:startDate/:endDate", async (req, res) => {
       .populate("place", { description: 1, _id: 0 })
       .populate("product", { name: 1, _id: 0 })
       .populate("detail_sales", { _id: 1, quantity: 1, sub_total: 1, total: 1 })
+      .populate("salaries", {
+        employee: 1,
+        date: 1,
+        amount: 1,
+        _id: 0,
+      })
       .populate("production_costs", {
         description: 1,
         date: 1,
@@ -240,6 +264,43 @@ route.put("/:id/inProgress", async (req, res) => {
 });
 
 route.delete("/:id", async (req, res) => {
+  const production = await Production.findById(req.params.id);
+  if (!production) {
+    return res.status(404).json({
+      name: "Produccion",
+      message: "La produccion no existe",
+    });
+  }
+  if (production.detail_sales.length > 0) {
+    return res.status(400).json({
+      name: "Produccion",
+      message: "La produccion no puede ser eliminada porque tiene ventas",
+    });
+  }
+  if (production.production_costs.length > 0) {
+    return res.status(400).json({
+      name: "Produccion",
+      message: "La produccion no puede ser eliminada porque tiene costos",
+    });
+  }
+  if (production.extra_moves.length > 0) {
+    return res.status(400).json({
+      name: "Produccion",
+      message: "La produccion no puede ser eliminada porque tiene movimientos",
+    });
+  }
+  if (production.salaries.length > 0) {
+    return res.status(400).json({
+      name: "Produccion",
+      message: "La produccion no puede ser eliminada porque tiene salarios",
+    });
+  }
+  if (production.harvest.length > 0) {
+    return res.status(400).json({
+      name: "Produccion",
+      message: "La produccion no puede ser eliminada porque tiene cosechas",
+    });
+  }
   const response = await Production.findByIdAndDelete(req.params.id);
   return res.status(200).json(response);
 });

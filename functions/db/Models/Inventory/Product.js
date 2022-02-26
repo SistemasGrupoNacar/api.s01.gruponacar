@@ -35,3 +35,4 @@ product.methods.toJSON = function () {
 };
 
 module.exports = Product = mongoose.model("Product", product);
+
