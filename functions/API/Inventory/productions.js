@@ -9,7 +9,7 @@ route.get("/", async (req, res) => {
   let productions = await Production.find({ in_progress: true })
     .sort({ _id: 1 })
     .populate("place", { description: 1, _id: 0 })
-    .populate("product", { name: 1, _id: 0 })
+    .populate("product", { name: 1, _id: 1 })
     .populate("detail_sales", { date: 1, status: 1, description: 1, total: 1 })
     .populate("production_costs", {
       description: 1,
@@ -34,7 +34,7 @@ route.get("/all", async (req, res) => {
   let productions = await Production.find({})
     .sort({ _id: 1 })
     .populate("place", { description: 1, _id: 0 })
-    .populate("product", { name: 1, _id: 0 })
+    .populate("product", { name: 1, _id: 1 })
     .populate("detail_sales", { date: 1, status: 1, description: 1, total: 1 })
     .populate("production_costs", {
       description: 1,
