@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const Employee = require("../../db/Models/Control/Employee");
+const User = require("../../db/Models/General/User");
+const EMPLOYEE_ROLE = "621cef20030784943a5fbc24";
+const { createHash } = require("../../scripts/encrypt");
+const DEFAULT_PASSWORD = process.env.DEFAULT_PASSWORD;
 
 router.get("/", async (req, res) => {
   try {
@@ -65,8 +69,35 @@ router.post(
         email: email != "" ? email : null,
         is_active: true,
       });
-      const response = await employeeModel.save();
-      return res.status(200).json(response);
+      let response = await employeeModel.save();
+      // CREACION DEL USUARIOPARA EL SISTEMA DE REGISTROS
+      //Se crea la contraseña por defecto
+      const password = createHash(DEFAULT_PASSWORD);
+      // declaracion de variables
+      let user;
+      let carry = 0;
+      let nickName;
+      do {
+        // Crear el usuario respectivo
+        nickName = getNickName(firstName, lastName, carry);
+        carry = nickName.carry;
+        //Se crea el usuario
+        user = await User.findOne({ username: nickName.username });
+      } while (user);
+      //Se crea el usuario
+      const userModel = new User({
+        username: nickName.username,
+        password: password,
+        employee: response._id,
+        role: EMPLOYEE_ROLE,
+      });
+      //Se guarda el usuario
+      await userModel.save();
+
+      return res.status(200).json({
+        username: nickName.username,
+        _id: response._id,
+      });
     } catch (error) {
       return res.status(500).json({
         name: error.name,
@@ -75,6 +106,22 @@ router.post(
     }
   }
 );
+
+function getNickName(firstName, lastName, carry) {
+  //Separa la primera parte del nombre y la primera parte del apellido
+  let fName = firstName.split(" ")[0].toLowerCase();
+  let lName = lastName.split(" ")[0].toLowerCase();
+  let username;
+  if (carry != 0) {
+    // Si ya esta ocupado el nombre sin el carry
+    username = fName + "." + lName + carry;
+  } else {
+    // Une el nombre y el apellido
+    username = fName + "." + lName;
+  }
+  carry++;
+  return { username, carry };
+}
 
 // Marcar empleado como activo
 router.put("/:id", async (req, res) => {
@@ -105,6 +152,12 @@ router.delete("/:id", async (req, res) => {
         message: "Empleado no encontrado",
       });
     }
+    // Verifica si el empleado tiene usuario y lo elimina
+    const user = await User.findOne({ employee: id });
+    if (user) {
+      await User.findByIdAndDelete(user._id);
+    }
+    // Verifica si el empleado tiene jornadas
     if (employee.journeys.length > 0) {
       employee.is_active = false;
       const response = await employee.save();
