@@ -1,7 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const route = express.Router();
-const axios = require("axios");
 const Sales = require("../../db/Models/Inventory/Sale");
 const InventoryEntry = require("../../db/Models/Inventory/InventoryEntry");
 const ExtraMove = require("../../db/Models/General/ExtraMove");

@@ -36,5 +36,6 @@ app.use("/positions", require("./API/Control/positions"));
 app.use("/employees", require("./API/Control/employees"));
 app.use("/journeys", require("./API/Control/journeys"));
 app.use("/salaries", require("./API/Control/salaries"));
+app.use("/register-actions", require("./API/Control/register.action"));
 
 exports.api = functions.https.onRequest(app);
