@@ -15,13 +15,16 @@ router.post(
   body("password").notEmpty().withMessage("El pin no puede estar vacío"),
   body("date").notEmpty().withMessage("La fecha no puede estar vacía"),
   body("date").isISO8601().withMessage("La fecha no es válida"),
+  body("coordinates")
+    .notEmpty()
+    .withMessage("Las coordenadas no pueden estar vacías"),
   async (req, res) => {
     // Valida errores de express-validator
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
-    const { action, username, password, date } = req.body;
+    const { action, username, password, date, coordinates } = req.body;
     try {
       // Busca el usuario
       const user = await User.findOne({ username });
@@ -55,6 +58,8 @@ router.post(
         const newJourney = new Journey({
           employee: user.employee,
           check_in: date,
+          coordinatesLat: coordinates.lat,
+          coordinatesLng: coordinates.lng,
         });
         const response = await newJourney.save();
         const employee = await Employee.findById(user.employee);

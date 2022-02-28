@@ -23,15 +23,13 @@ const journey = new mongoose.Schema(
       type: String,
       default: null,
     },
-    coordinates: {
-      lat: {
-        type: Number,
-        default: null,
-      },
-      lng: {
-        type: Number,
-        default: null,
-      },
+    coordinatesLat: {
+      type: Number,
+      default: null,
+    },
+    coordinatesLng: {
+      type: Number,
+      default: null,
     },
   },
   {

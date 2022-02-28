@@ -44,7 +44,8 @@ route.post(
       const journeyModel = new Journey({
         employee: employee,
         check_in: check_in,
-        coordinates: coordinates,
+        coordinatesLat: coordinates.lat,
+        coordinatesLng: coordinates.lng,
       });
       const response = await journeyModel.save();
 
