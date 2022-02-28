@@ -32,6 +32,7 @@ route.post(
   body("employee").notEmpty().withMessage("Empleado es requerido"),
   body("check_in").notEmpty().withMessage("Hora de entrada es requerida"),
   body("check_in").isISO8601().withMessage("Hora de entrada no es válida"),
+  body("coordinates").notEmpty().withMessage("Coordenadas son requeridas"),
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -39,10 +40,11 @@ route.post(
     }
 
     try {
-      const { employee, check_in } = req.body;
+      const { employee, check_in, coordinates } = req.body;
       const journeyModel = new Journey({
         employee: employee,
         check_in: check_in,
+        coordinates: coordinates,
       });
       const response = await journeyModel.save();
 
