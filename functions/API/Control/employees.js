@@ -55,11 +55,14 @@ router.post(
       return res.status(422).json({ errors: errors.array() });
     }
     try {
-      const { firstName, lastName, position } = req.body;
+      const { firstName, lastName, position, dui, phone, email } = req.body;
       const employeeModel = new Employee({
         first_name: firstName,
         last_name: lastName,
         position: position,
+        dui: dui != "" ? dui : null,
+        phone: phone != "" ? phone : null,
+        email: email != "" ? email : null,
         is_active: true,
       });
       const response = await employeeModel.save();
@@ -73,6 +76,26 @@ router.post(
   }
 );
 
+// Marcar empleado como activo
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const employee = await Employee.findByIdAndUpdate(
+      id,
+      {
+        is_active: true,
+      },
+      { new: true }
+    );
+    return res.status(200).json(employee);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
+
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -82,10 +105,14 @@ router.delete("/:id", async (req, res) => {
         message: "Empleado no encontrado",
       });
     }
-    employee.is_active = false;
-    const response = await employee.save();
-    await Employee.deleteOne({ _id: id });
-    return res.status(200).json(response);
+    if (employee.journeys.length > 0) {
+      employee.is_active = false;
+      const response = await employee.save();
+      return res.status(200).json(response);
+    } else {
+      const response = await Employee.deleteOne({ _id: id });
+      return res.status(200).json(response);
+    }
   } catch (error) {
     return res.status(500).json({
       name: error.name,

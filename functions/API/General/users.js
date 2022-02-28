@@ -6,10 +6,15 @@ const Role = require("../../db/Models/General/Role");
 const { body, validationResult } = require("express-validator");
 let { authenticateToken } = require("../../middleware/auth");
 const { comparePassword, createHash } = require("../../scripts/encrypt.js");
+const Employee = require("../../db/Models/Control/Employee");
 
 route.get("/", async (req, res) => {
   const users = await User.find()
     .sort({ _id: 1 })
+    .populate("employee", {
+      first_name: 1,
+      last_name: 1,
+    })
     .populate("role", { title: 1, _id: 0 });
   res.status(200).json(users);
 });
@@ -18,14 +23,10 @@ route.post(
   "/",
   body("username").notEmpty().withMessage("Usuario requerido"),
   body("password").notEmpty().withMessage("Contraseña requerida"),
-  body("firstName").notEmpty().withMessage("Nombre requerido"),
-  body("lastName").notEmpty().withMessage("Apellido requerido"),
-  body("dui").notEmpty().withMessage("DUI requerido"),
   body("role").notEmpty().withMessage("Rol requerido"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
-    const { firstName, lastName, phone, dui, username, password, role } =
-      req.body;
+    const { username, password, employee, role } = req.body;
 
     try {
       let user = await User.findOne({ username: username });
@@ -42,19 +43,25 @@ route.post(
           message: "El rol no existe",
         });
       }
+      // Verifica que el empleado exista
+      if (employee) {
+        if (!(await Employee.findById(employee))) {
+          return res.status(400).json({
+            name: "Empleado",
+            message: "El empleado no existe",
+          });
+        }
+      }
       //encriptar contraseña
       const encryptPass = createHash(password);
       const createdUser = new User({
-        firstName,
-        lastName,
-        phone,
-        dui,
         username,
         password: encryptPass,
+        employee,
         role,
       });
-      await createdUser.save();
-      res.status(201).json(createdUser);
+      const response = await createdUser.save();
+      return res.status(201).json(response);
     } catch (error) {
       res.status(500).json({
         name: error.name,
