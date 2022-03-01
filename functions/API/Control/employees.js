@@ -139,9 +139,14 @@ function getNickName(firstName, lastName, carry) {
     // Une el nombre y el apellido
     username = fName + "." + lName;
   }
+  username = removeAccents(username);
   carry++;
   return { username, carry };
 }
+// Eliminar acentos
+const removeAccents = (str) => {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+} 
 
 // Marcar empleado como activo o inactivo
 router.put(
