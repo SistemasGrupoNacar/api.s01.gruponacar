@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { body, validationResult } = require("express-validator");
+const { body, validationResult, param } = require("express-validator");
 const Employee = require("../../db/Models/Control/Employee");
 const User = require("../../db/Models/General/User");
 const EMPLOYEE_ROLE = "621cef20030784943a5fbc24";
@@ -40,6 +40,26 @@ router.get("/all", async (req, res) => {
         check_out: 1,
       });
     return res.status(200).json(employees);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
+
+router.get("/last", async (req, res) => {
+  try {
+    const employee = await Employee.find({ is_active: true })
+      .populate("position", {
+        _id: 0,
+        description: 1,
+      })
+      .sort({
+        createdAt: -1,
+      })
+      .limit(5);
+    return res.status(200).json(employee);
   } catch (error) {
     return res.status(500).json({
       name: error.name,
@@ -123,25 +143,36 @@ function getNickName(firstName, lastName, carry) {
   return { username, carry };
 }
 
-// Marcar empleado como activo
-router.put("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const employee = await Employee.findByIdAndUpdate(
-      id,
-      {
-        is_active: true,
-      },
-      { new: true }
-    );
-    return res.status(200).json(employee);
-  } catch (error) {
-    return res.status(500).json({
-      name: error.name,
-      message: error.message,
-    });
+// Marcar empleado como activo o inactivo
+router.put(
+  "/:id/status/:status",
+  param("status").notEmpty().withMessage("Estado es requerido"),
+  param("status").isBoolean().withMessage("Estado debe ser booleano"),
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    try {
+      const { id, status } = req.params;
+      const employee = await Employee.findByIdAndUpdate(
+        id,
+        {
+          is_active: status,
+        },
+        {
+          new: true,
+        }
+      );
+      return res.status(200).json(employee);
+    } catch (error) {
+      return res.status(500).json({
+        name: error.name,
+        message: error.message,
+      });
+    }
   }
-});
+);
 
 router.delete("/:id", async (req, res) => {
   try {

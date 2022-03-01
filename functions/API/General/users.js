@@ -71,6 +71,45 @@ route.post(
   }
 );
 
+// Cambia la contraseña de un usuario empleado recien registrado
+route.put(
+  "/:username/change-password",
+  body("password").notEmpty().withMessage("Contraseña requerida"),
+  body("newPassword").notEmpty().withMessage("Nueva contraseña requerida"),
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    try {
+      const { username } = req.params;
+      const { password, newPassword } = req.body;
+      const user = await User.findOne({ username: username });
+      if (!user) {
+        return res.status(404).json({
+          message: "Usuario no encontrado",
+        });
+      }
+      const compare = await comparePassword(password, user.password);
+      if (!compare) {
+        return res.status(400).json({
+          message: "Contraseña incorrecta",
+        });
+      }
+      const encryptPass = createHash(newPassword);
+      const response = await User.findByIdAndUpdate(user._id, {
+        password: encryptPass,
+      });
+      return res.status(200).json(response);
+    } catch (error) {
+      return res.status(500).json({
+        name: error.name,
+        message: error.message,
+      });
+    }
+  }
+);
+
 // Cambiar la contrasenia de un usuario
 route.put(
   "/change-password",
