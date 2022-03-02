@@ -6,23 +6,93 @@ const Employee = require("../../db/Models/Control/Employee");
 
 route.get("/", async (req, res) => {
   try {
-    const journeys = await Journey.find();
+    const journeys = await Journey.find().populate("employee", {
+      first_name: 1,
+      last_name: 1,
+      _id: 1,
+    });
     return res.status(200).json(journeys);
   } catch (error) {
     return res.status(500).json({
       name: error.name,
+      message: error.message,
     });
   }
 });
 
 // Obtener jornada especifica por id
-route.get("/:id", async (req, res) => {
+route.get("/byId/:id", async (req, res) => {
   try {
     const journey = await Journey.findById(req.params.id);
     return res.status(200).json(journey);
   } catch (error) {
     return res.status(500).json({
       name: error.name,
+      message: error.message,
+    });
+  }
+});
+
+// Obtener las ultimas 5 jornadas
+route.get("/last", async (req, res) => {
+  try {
+    const journeys = await Journey.find()
+      .populate("employee", {
+        first_name: 1,
+        last_name: 1,
+        _id: 1,
+      })
+      .sort({
+        createdAt: -1,
+      })
+      .limit(5);
+    return res.status(200).json(journeys);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
+
+// Obtener las jornadas en proceso
+route.get("/in-progress", async (req, res) => {
+  try {
+    const journeys = await Journey.find({
+      check_out: null,
+    }).populate("employee", {
+      first_name: 1,
+      last_name: 1,
+      _id: 1,
+    });
+    return res.status(200).json(journeys);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
+
+// Obtener las jornadas de un empleado en especifico
+route.get("/employee/:id", async (req, res) => {
+  try {
+    if (req.query.limit) {
+      const limit = parseInt(req.query.limit);
+      const journeys = await Journey.find({ employee: req.params.id })
+        .sort({ createdAt: -1 })
+        .limit(limit);
+      return res.status(200).json(journeys);
+    } else {
+      const journeys = await Journey.find({ employee: req.params.id }).sort({
+        createdAt: -1,
+      });
+      return res.status(200).json(journeys);
+    }
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
     });
   }
 });
@@ -44,8 +114,8 @@ route.post(
       const journeyModel = new Journey({
         employee: employee,
         check_in: check_in,
-        coordinatesLat: coordinates.lat,
-        coordinatesLng: coordinates.lng,
+        inCoordinatesLat: coordinates.lat,
+        inCoordinatesLng: coordinates.lng,
       });
       const response = await journeyModel.save();
 
@@ -69,6 +139,7 @@ route.put(
   "/:id",
   body("check_out").notEmpty().withMessage("Hora de salida es requerida"),
   body("check_out").isISO8601().withMessage("Hora de salida no es válida"),
+  body("coordinates").notEmpty().withMessage("Coordenadas son requeridas"),
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -76,13 +147,15 @@ route.put(
     }
 
     try {
-      const { check_out, description, was_worked } = req.body;
+      const { check_out, description, was_worked, coordinates } = req.body;
       const response = await Journey.findByIdAndUpdate(
         req.params.id,
         {
           check_out,
           description,
           was_worked,
+          outCoordinatesLat: coordinates.lat,
+          outCoordinatesLng: coordinates.lng,
         },
         { new: true }
       );

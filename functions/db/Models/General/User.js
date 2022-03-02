@@ -10,11 +10,6 @@ const user = new mongoose.Schema(
       type: String,
       required: true,
     },
-    employee: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Employee",
-      default: null,
-    },
     role: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Role",

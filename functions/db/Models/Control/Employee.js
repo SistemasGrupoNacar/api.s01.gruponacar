@@ -33,6 +33,11 @@ const employee = new mongoose.Schema(
         ref: "Journey",
       },
     ],
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     is_active: {
       type: Boolean,
       required: true,
