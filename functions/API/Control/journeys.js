@@ -6,11 +6,15 @@ const Employee = require("../../db/Models/Control/Employee");
 
 route.get("/", async (req, res) => {
   try {
-    const journeys = await Journey.find().populate("employee", {
-      first_name: 1,
-      last_name: 1,
-      _id: 1,
-    });
+    const journeys = await Journey.find()
+      .populate("employee", {
+        first_name: 1,
+        last_name: 1,
+        _id: 1,
+      })
+      .sort({
+        createdAt: -1,
+      });
     return res.status(200).json(journeys);
   } catch (error) {
     return res.status(500).json({
@@ -23,7 +27,9 @@ route.get("/", async (req, res) => {
 // Obtener jornada especifica por id
 route.get("/byId/:id", async (req, res) => {
   try {
-    const journey = await Journey.findById(req.params.id);
+    const journey = await Journey.findById(req.params.id).sort({
+      createdAt: -1,
+    });
     return res.status(200).json(journey);
   } catch (error) {
     return res.status(500).json({
@@ -60,11 +66,15 @@ route.get("/in-progress", async (req, res) => {
   try {
     const journeys = await Journey.find({
       check_out: null,
-    }).populate("employee", {
-      first_name: 1,
-      last_name: 1,
-      _id: 1,
-    });
+    })
+      .populate("employee", {
+        first_name: 1,
+        last_name: 1,
+        _id: 1,
+      })
+      .sort({
+        createdAt: -1,
+      });
     return res.status(200).json(journeys);
   } catch (error) {
     return res.status(500).json({
