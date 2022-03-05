@@ -33,7 +33,6 @@ route.post(
             message: "No tiene permisos para acceder a este portal",
           });
         }
-        console.log(role);
       }
       if (comparePassword(password, user.password)) {
         const token = setToken({

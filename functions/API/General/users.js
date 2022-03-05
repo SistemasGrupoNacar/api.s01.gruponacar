@@ -9,14 +9,17 @@ const { comparePassword, createHash } = require("../../scripts/encrypt.js");
 const Employee = require("../../db/Models/Control/Employee");
 
 route.get("/", async (req, res) => {
-  const users = await User.find()
-    .sort({ _id: 1 })
-    .populate("employee", {
-      first_name: 1,
-      last_name: 1,
-    })
-    .populate("role", { title: 1, _id: 0 });
-  res.status(200).json(users);
+  try {
+    const users = await User.find()
+      .sort({ _id: 1 })
+      .populate("role", { title: 1, _id: 0 });
+    res.status(200).json(users);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
 });
 
 route.post(
@@ -43,7 +46,7 @@ route.post(
           message: "El rol no existe",
         });
       }
-     
+
       //encriptar contraseña
       const encryptPass = createHash(password);
       const createdUser = new User({

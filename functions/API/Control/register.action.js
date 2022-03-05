@@ -40,7 +40,7 @@ router.post(
       // Verifica que el empleado exista
       if (!employee) {
         return res.status(404).json({
-          message: "El empleado no existe",
+          message: "El empleado no se encontró, verifique su rol",
         });
       }
 
