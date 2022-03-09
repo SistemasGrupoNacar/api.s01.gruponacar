@@ -152,6 +152,34 @@ route.put(
   }
 );
 
+// Cambiar avatar de un usuario
+route.put(
+  "/:username/change-avatar",
+  authenticateToken,
+  body("avatar").notEmpty().withMessage("Avatar requerido"),
+  async (req, res) => {
+    try {
+      const { username } = req.params;
+      const { avatar } = req.body;
+      const user = await User.findOne({ username: username });
+      if (!user) {
+        return res.status(404).json({
+          name: "Usuario",
+          message: "El usuario no existe",
+        });
+      }
+      user.avatar = avatar;
+      let userN = await user.save();
+      res.status(200).json(userN);
+    } catch (error) {
+      res.status(500).json({
+        name: error.name,
+        message: error.message,
+      });
+    }
+  }
+);
+
 route.delete("/:id", async (req, res) => {
   const { id } = req.params;
   const user = await User.findById(id);
