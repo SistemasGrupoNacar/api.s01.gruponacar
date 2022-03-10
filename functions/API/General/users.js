@@ -10,10 +10,10 @@ const Employee = require("../../db/Models/Control/Employee");
 
 route.get("/", async (req, res) => {
   try {
-    const users = await User.find()
+    let users = await User.find()
       .sort({ _id: 1 })
       .populate("role", { title: 1, _id: 0 });
-    res.status(200).json(users);
+    return res.status(200).json(users);
   } catch (error) {
     return res.status(500).json({
       name: error.name,
@@ -41,16 +41,18 @@ route.get("/last", async (req, res) => {
 // Obtener usuario por id
 route.get("/:id", async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).populate("role", {
+    const { id } = req.params;
+    const user = await User.findById(id).populate("role", {
       title: 1,
       _id: 0,
     });
     // Verifica si el rol es de empleado
-    if (user.role.title === "Employee") {
-      const employee = await Employee.find({ user: user._id });
-      user.employee = employee;
-    }
-    res.status(200).json(user);
+    let employee = await Employee.find({ user: id });
+    const response = {
+      user,
+      employee,
+    };
+    res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({
       name: error.name,
