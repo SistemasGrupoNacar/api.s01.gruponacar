@@ -46,7 +46,7 @@ route.get("/:id", async (req, res) => {
       _id: 0,
     });
     // Verifica si el rol es de empleado
-    if (user.role.title === "Empleado") {
+    if (user.role.title === "Employee") {
       const employee = await Employee.find({ user: user._id });
       user.employee = employee;
     }

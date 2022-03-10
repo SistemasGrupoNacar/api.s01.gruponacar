@@ -32,6 +32,23 @@ user.methods.toJSON = function () {
   delete obj.__v;
   delete obj.createdAt;
   delete obj.updatedAt;
+
+  // Traducir el rol al español
+  if (obj.role) {
+    switch (obj.role.title) {
+      case "Admin":
+        obj.role.title_format = "Administrador";
+        break;
+      case "Employee":
+        obj.role.title_format = "Empleado";
+        break;
+      case "Client":
+        obj.role.title_format = "Cliente";
+        break;
+      default:
+        break;
+    }
+  }
   return obj;
 };
 
