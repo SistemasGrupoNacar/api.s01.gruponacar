@@ -22,6 +22,43 @@ route.get("/", async (req, res) => {
   }
 });
 
+// Obtener los ultimos usuarios registrados
+route.get("/last", async (req, res) => {
+  try {
+    const users = await User.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .populate("role", { title: 1, _id: 0 });
+    res.status(200).json(users);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
+
+// Obtener usuario por id
+route.get("/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).populate("role", {
+      title: 1,
+      _id: 0,
+    });
+    // Verifica si el rol es de empleado
+    if (user.role.title === "Empleado") {
+      const employee = await Employee.find({ user: user._id });
+      user.employee = employee;
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
+
 route.post(
   "/",
   body("username").notEmpty().withMessage("Usuario requerido"),
