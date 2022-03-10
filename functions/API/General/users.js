@@ -7,6 +7,7 @@ const { body, validationResult } = require("express-validator");
 let { authenticateToken } = require("../../middleware/auth");
 const { comparePassword, createHash } = require("../../scripts/encrypt.js");
 const Employee = require("../../db/Models/Control/Employee");
+const Journey = require("../../db/Models/Control/Journey");
 
 route.get("/", async (req, res) => {
   try {
@@ -228,6 +229,15 @@ route.delete("/:id", async (req, res) => {
       message: "No se encontro el usuario",
     });
   }
+  // Verifica si el usuario esta asociado a un empleado
+  const employee = await Employee.findOne({ user: id });
+  if (employee) {
+    return res.status(400).json({
+      name: "Usuario",
+      message: "El usuario esta asociado a un empleado",
+    });
+  }
+
   const response = await User.findByIdAndDelete(id);
   return res.status(200).json(response);
 });
