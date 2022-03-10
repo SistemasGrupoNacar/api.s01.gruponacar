@@ -18,6 +18,22 @@ role.methods.toJSON = function () {
   delete obj.__v;
   delete obj.createdAt;
   delete obj.updatedAt;
+  switch (obj.title) {
+    case "Admin":
+      obj.title_format = "Administrador";
+      break;
+    case "Employee":
+      obj.title_format = "Empleado";
+      break;
+    case "Client":
+      obj.title_format = "Cliente";
+      break;
+    case "Watcher":
+      obj.title_format = "Observador";
+      break;
+    default:
+      break;
+  }
   return obj;
 };
 

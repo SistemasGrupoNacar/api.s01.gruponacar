@@ -45,6 +45,9 @@ user.methods.toJSON = function () {
       case "Client":
         obj.role.title_format = "Cliente";
         break;
+      case "Watcher":
+        obj.role.title_format = "Observador";
+        break;
       default:
         break;
     }

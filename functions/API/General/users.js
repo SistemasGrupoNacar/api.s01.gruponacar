@@ -105,6 +105,37 @@ route.post(
   }
 );
 
+// Verificar la disponibilidad de un username
+route.post(
+  "/verify-username",
+  body("username").notEmpty().withMessage("Usuario requerido"),
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        name: "Usuario",
+        message: "Usuario requerido",
+      });
+    }
+    const { username } = req.body;
+    try {
+      const user = await User.findOne({ username: username });
+      if (user) {
+        return res.status(400).json({
+          name: "Usuario",
+          message: "El usuario ya existe",
+        });
+      }
+      return res.status(200).json(username);
+    } catch (error) {
+      return res.status(500).json({
+        name: error.name,
+        message: error.message,
+      });
+    }
+  }
+);
+
 // Cambia la contraseña de un usuario empleado recien registrado
 route.put(
   "/:username/change-password",
