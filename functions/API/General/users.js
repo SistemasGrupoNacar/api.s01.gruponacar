@@ -69,7 +69,7 @@ route.post(
   body("role").notEmpty().withMessage("Rol requerido"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
-    const { username, password, role } = req.body;
+    const { username, password, role, avatar } = req.body;
 
     try {
       let user = await User.findOne({ username: username });
@@ -93,6 +93,7 @@ route.post(
         username,
         password: encryptPass,
         role,
+        avatar,
       });
       const response = await createdUser.save();
       return res.status(201).json(response);
