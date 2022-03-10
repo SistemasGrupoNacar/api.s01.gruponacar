@@ -15,6 +15,10 @@ const user = new mongoose.Schema(
       ref: "Role",
       required: true,
     },
+    avatar: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,
