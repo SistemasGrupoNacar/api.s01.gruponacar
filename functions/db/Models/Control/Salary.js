@@ -6,7 +6,7 @@ const salary = new mongoose.Schema(
       type: String,
       default: null,
     },
-    amount: {
+    total: {
       type: Number,
       required: true,
     },
@@ -29,5 +29,25 @@ const salary = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+salary.methods.toJSON = function () {
+  const obj = this.toObject();
+  delete obj.__v;
+  delete obj.createdAt;
+  delete obj.updatedAt;
+  if (obj.date) {
+    obj.date_format = new Date(obj.date).toLocaleString("es-ES", {
+      timeZone: "America/El_Salvador",
+      hour12: true,
+    });
+  }
+  if (obj.total) {
+    obj.total_format = obj.total.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
+  }
+  return obj;
+};
 
 module.exports = Salary = mongoose.model("Salary", salary);

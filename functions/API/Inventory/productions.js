@@ -22,7 +22,7 @@ route.get("/", async (req, res) => {
     .populate("salaries", {
       employee: 1,
       date: 1,
-      amount: 1,
+      total: 1,
       _id: 0,
     })
     .populate("harvest", { quantity: 1, date: 1, description: 1 });
@@ -47,7 +47,7 @@ route.get("/all", async (req, res) => {
     .populate("salaries", {
       employee: 1,
       date: 1,
-      amount: 1,
+      total: 1,
       _id: 0,
     })
     .populate("harvest", { quantity: 1, date: 1, description: 1 });
@@ -107,7 +107,7 @@ route.get("/end/:startDate/:endDate", async (req, res) => {
       .populate("salaries", {
         employee: 1,
         date: 1,
-        amount: 1,
+        total: 1,
         _id: 0,
       })
       .populate("production_costs", {
@@ -173,8 +173,8 @@ route.put(
       .populate("production_costs")
       .populate("product")
       .populate("place")
-      .populate("detail_sales");
-    //.populate("Salary");
+      .populate("detail_sales")
+      .populate("salaries");
 
     //validar que exista la produccion
     if (!production) {
@@ -204,9 +204,9 @@ route.put(
     production.production_costs.forEach((cost) => {
       total_costs += cost.total;
     });
-    /*production.salaries.forEach((salary) => {
+    production.salaries.forEach((salary) => {
       total_costs += salary.total;
-    });*/
+    });
     production.extra_moves.forEach((move) => {
       if (move.type === "egress") {
         total_costs += move.total;

@@ -158,8 +158,8 @@ const getDataRangeIngress = (sales, extra) => {
   };
 };
 // Obtiene los datos del rango de fecha dado
-const getDataRangeEgress = (inventoryEntries, extra) => {
-  let joined = inventoryEntries.concat(extra);
+const getDataRangeEgress = (inventoryEntries, salaries, extra) => {
+  let joined = inventoryEntries.concat(extra.concat(salaries));
   // Sacar el total de los extras
   const totalExtra = totalFunction(extra);
 
@@ -178,11 +178,16 @@ const getDataRangeEgress = (inventoryEntries, extra) => {
   };
 };
 // Obtiene los datos del mes actual en egresos
-const getDataCurrentMonthEgress = (egress, extra) => {
+const getDataCurrentMonthEgress = (egress, salaries, extra) => {
   // Obtener el mes actual
   const currentMonth = new Date().getUTCMonth() + 1;
   // Recorrer todos los datos
   let thisMonthEgress = egress.filter((element) => {
+    const month = new Date(element._id).getUTCMonth() + 1;
+    return month === currentMonth;
+  });
+
+  let thisMonthSalaries = salaries.filter((element) => {
     const month = new Date(element._id).getUTCMonth() + 1;
     return month === currentMonth;
   });
@@ -192,7 +197,7 @@ const getDataCurrentMonthEgress = (egress, extra) => {
     return month === currentMonth;
   });
   // Unir datos
-  const data = thisMonthEgress.concat(thisMonthExtra);
+  const data = thisMonthEgress.concat(thisMonthExtra.concat(thisMonthSalaries));
   // Sacar el total de los extras
   const totalExtra = totalFunction(thisMonthExtra);
 

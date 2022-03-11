@@ -6,7 +6,41 @@ const Production = require("../../db/Models/Inventory/Production");
 
 router.get("/", async (req, res) => {
   try {
-    const salaries = await Salary.find();
+    const salaries = await Salary.find()
+      .sort({ createdAt: -1 })
+      .populate("production", {
+        _id: 1,
+        description: 1,
+      })
+      .populate("employee", {
+        _id: 1,
+        first_name: 1,
+        last_name: 1,
+      });
+    return res.status(200).json(salaries);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
+
+// Obtener ultimos salarios
+router.get("/last", async (req, res) => {
+  try {
+    const salaries = await Salary.find()
+      .populate("production", {
+        _id: 1,
+        description: 1,
+      })
+      .populate("employee", {
+        _id: 1,
+        first_name: 1,
+        last_name: 1,
+      })
+      .sort({ createdAt: -1 })
+      .limit(5);
     return res.status(200).json(salaries);
   } catch (error) {
     return res.status(500).json({
@@ -33,7 +67,7 @@ router.post(
       const salaryModel = new Salary({
         employee: employee,
         date: date,
-        amount: amount,
+        total: amount,
         description: description || "",
         production: production || null,
       });
