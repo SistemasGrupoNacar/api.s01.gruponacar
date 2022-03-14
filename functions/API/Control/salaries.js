@@ -50,6 +50,39 @@ router.get("/last", async (req, res) => {
   }
 });
 
+// Obtener los salarios de un empleado solo de el mes actual
+router.get("/total/:employee", async (req, res) => {
+  try {
+    const salaries = await Salary.find({
+      employee: req.params.employee,
+      createdAt: {
+        $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+        $lte: new Date(new Date().getFullYear(), new Date().getMonth() + 1),
+      },
+    }).populate("production", {
+      _id: 1,
+      description: 1,
+    });
+    let total = 0;
+    salaries.forEach((salary) => {
+      total += salary.total;
+    });
+    // Darle formato de dolar estadounidense
+    total = total.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
+    return res.status(200).json({
+      total: total,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
+
 router.post(
   "/",
   body("employee").notEmpty().withMessage("Empleado es requerido"),
