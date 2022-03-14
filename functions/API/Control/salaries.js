@@ -17,6 +17,9 @@ router.get("/", async (req, res) => {
         _id: 1,
         first_name: 1,
         last_name: 1,
+      })
+      .sort({
+        date: -1,
       });
     return res.status(200).json(salaries);
   } catch (error) {
@@ -40,7 +43,7 @@ router.get("/last", async (req, res) => {
         first_name: 1,
         last_name: 1,
       })
-      .sort({ createdAt: -1 })
+      .sort({ date: -1 })
       .limit(5);
     return res.status(200).json(salaries);
   } catch (error) {
