@@ -9,7 +9,10 @@ route.get("/", async (req, res) => {
   try {
     let extraMoves = await ExtraMove.find()
       // Popular con typeMove
-      .populate("type_move", { title: 1, _id: 1 });
+      .populate("type_move", { title: 1, _id: 1 })
+      .sort({
+        date: -1,
+      });
 
     return res.status(200).json(extraMoves);
   } catch (error) {

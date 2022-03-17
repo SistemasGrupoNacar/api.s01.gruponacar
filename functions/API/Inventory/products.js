@@ -74,6 +74,12 @@ route.put(
         message: "El producto no existe",
       });
     }
+    if (product.stock > 0) {
+      return res.status(400).json({
+        name: "Producto",
+        message: "El producto no puede ser deshabilitado porque tiene stock",
+      });
+    }
     product.availability = availability;
     let response = await product.save();
     return res.status(200).json(response);
@@ -125,7 +131,25 @@ route.put(
 
 route.delete("/:id", async (req, res) => {
   try {
-    let response = await Product.findByIdAndDelete(req.params.id);
+    const { id } = req.params;
+    // Verifica si todavia tiene stock
+    let product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({
+        name: "Producto",
+        message: "El producto no existe",
+      });
+    }
+    if (product.stock > 0) {
+      return res.status(400).json({
+        name: "Producto",
+        message: "El producto aun tiene stock",
+      });
+    }
+
+    const response = await Product.findByIdAndUpdate(id, {
+      availability: false,
+    });
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({

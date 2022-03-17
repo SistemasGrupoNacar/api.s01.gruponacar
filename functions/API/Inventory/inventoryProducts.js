@@ -52,7 +52,9 @@ route.get("/:id", async (req, res) => {
 route.get("/list/minStock", async (req, res) => {
   try {
     // obtener listado de productos
-    let inventoryProducts = await InventoryProduct.find().sort({ _id: 1 });
+    let inventoryProducts = await InventoryProduct.find({
+      availability: true,
+    }).sort({ _id: 1 });
     // obtener listado de productos con stock debajo del minimo
     let minStockProducts = inventoryProducts.filter(
       (product) => product.stock < product.min_stock
@@ -202,8 +204,15 @@ route.delete("/:id", async (req, res) => {
       message: "El producto de produccion no existe",
     });
   }
-  await inventoryProduct.remove();
-  return res.status(200).json(inventoryProduct);
+  if (inventoryProduct.stock > 0) {
+    return res.status(400).json({
+      message: "El producto de produccion tiene stock",
+    });
+  }
+  // Cambiar availability a false
+  inventoryProduct.availability = false;
+  const response = await inventoryProduct.save();
+  return res.status(200).json(response);
 });
 
 module.exports = route;

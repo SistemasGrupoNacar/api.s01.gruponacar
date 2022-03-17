@@ -46,7 +46,9 @@ route.get("/", async (req, res) => {
 
 const getProductsWithLessStock = async () => {
   // Obtener los productos que su stock sea menor o igual que el min_stock
-  const products = await InventoryProduct.find();
+  const products = await InventoryProduct.find({
+    availability: true,
+  });
   const productsWithLessStock = [];
   products.forEach((element) => {
     if (element.stock <= element.min_stock) {
