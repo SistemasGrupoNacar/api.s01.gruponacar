@@ -5,6 +5,7 @@ const { getState } = require("../../db/db-status");
 const { body, param } = require("express-validator");
 const Product = require("../../db/Models/Inventory/Product");
 const { log } = require("console");
+const Production = require("../../db/Models/Inventory/Production");
 
 // con restriccion de availability
 route.get("/", async (req, res) => {
@@ -35,6 +36,9 @@ route.get("/all", async (req, res) => {
 route.post(
   "/",
   body("name").notEmpty().withMessage("El nombre no debe estar vacio"),
+  body("unitOfMeasurement")
+    .notEmpty()
+    .withMessage("La unidad de medida no debe estar vacia"),
   body("availability")
     .isBoolean()
     .withMessage("La disponibilidad debe ser booleano"),
@@ -42,11 +46,15 @@ route.post(
     .notEmpty()
     .withMessage("La disponibilidad no debe estar vacia"),
   async (req, res) => {
-    errors.validationErrorResponse(req, res);
-    const { name, description, availability } = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    const { name, unitOfMeasurement, description, availability } = req.body;
     let productModel = new Product({
       name,
       stock: 0,
+      unit_of_measurement: unitOfMeasurement,
       description,
       availability,
     });
@@ -147,9 +155,41 @@ route.delete("/:id", async (req, res) => {
       });
     }
 
-    const response = await Product.findByIdAndUpdate(id, {
-      availability: false,
+    // Verifica que el producto no haya sido asignado a ninguna produccion
+    const production = await Production.findOne({
+      product: id,
     });
+    if (production) {
+      return res.status(400).json({
+        name: "Producto",
+        message:
+          "El producto no puede ser eliminado porque esta asignado a una produccion",
+      });
+    }
+    // Verifica si ha tenido alguna cosecha
+    const harvest = await Harvest.findOne({
+      product: id,
+    });
+    if (harvest) {
+      return res.status(400).json({
+        name: "Producto",
+        message:
+          "El producto no puede ser eliminado porque esta asignado a una cosecha",
+      });
+    }
+
+    // Verifica si ha tenido alguna venta
+    const detail_sale = await DetailSale.findOne({
+      product: id,
+    });
+    if (detail_sale) {
+      return res.status(400).json({
+        name: "Producto",
+        message:
+          "El producto no puede ser eliminado porque esta asignado a una venta",
+      });
+    }
+    const response = await Product.findByIdAndDelete(id);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({

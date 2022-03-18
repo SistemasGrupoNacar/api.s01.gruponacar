@@ -10,6 +10,10 @@ const product = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    unit_of_measurement: {
+      type: String,
+      required: true,
+    },
     description: {
       type: String,
     },
@@ -35,4 +39,3 @@ product.methods.toJSON = function () {
 };
 
 module.exports = Product = mongoose.model("Product", product);
-

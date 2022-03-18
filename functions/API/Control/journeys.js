@@ -124,8 +124,8 @@ route.post(
       const journeyModel = new Journey({
         employee: employee,
         check_in: check_in,
-        inCoordinatesLat: coordinates.lat,
-        inCoordinatesLng: coordinates.lng,
+        in_coordinates_lat: coordinates.lat,
+        in_coordinates_lng: coordinates.lng,
       });
       const response = await journeyModel.save();
 
@@ -164,8 +164,8 @@ route.put(
           check_out,
           description,
           was_worked,
-          outCoordinatesLat: coordinates.lat,
-          outCoordinatesLng: coordinates.lng,
+          out_coordinates_lat: coordinates.lat,
+          out_coordinates_lng: coordinates.lng,
         },
         { new: true }
       );

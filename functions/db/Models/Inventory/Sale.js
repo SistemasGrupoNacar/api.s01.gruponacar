@@ -28,6 +28,10 @@ const sale = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    iva: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,
@@ -52,6 +56,14 @@ sale.methods.toJSON = function () {
   // Convertir el total a dolar
   if (obj.total) {
     obj.total_format = obj.total.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
+  }
+
+  // Convertir el iva a dolar
+  if (obj.iva) {
+    obj.iva_format = obj.iva.toLocaleString("en-US", {
       style: "currency",
       currency: "USD",
     });
