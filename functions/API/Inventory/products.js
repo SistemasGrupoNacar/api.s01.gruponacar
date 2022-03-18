@@ -2,7 +2,7 @@ const express = require("express");
 const route = express.Router();
 const { errors } = require("../../middleware/errors");
 const { getState } = require("../../db/db-status");
-const { body, param } = require("express-validator");
+const { body, param, validationResult } = require("express-validator");
 const Product = require("../../db/Models/Inventory/Product");
 const { log } = require("console");
 const Production = require("../../db/Models/Inventory/Production");
@@ -31,6 +31,19 @@ route.get("/all", async (req, res) => {
     products = await Product.find({}).sort({ name: 1 });
   }
   return res.status(200).json(products);
+});
+
+// Obtener producto en especifico
+route.get("/:id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    return res.status(200).json(product);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
 });
 
 route.post(
