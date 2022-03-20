@@ -38,10 +38,7 @@ route.post(
         const token = setToken({
           _id: user._id,
           username: user.username,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          dui: user.dui,
-          phone: user.phone,
+          avatar: user.avatar,
         });
         return res.status(200).json(token);
       } else {
