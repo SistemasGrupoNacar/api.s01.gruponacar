@@ -8,6 +8,8 @@ const { body } = require("express-validator");
 const { graphic } = require("../../scripts/graphic");
 const { checkDates } = require("../../scripts/dates");
 const { total } = require("../../scripts/total");
+
+let { authenticateToken } = require("../../middleware/auth");
 const {
   getDataLastThreeMonths,
   verifyDataForPercentage,
@@ -17,7 +19,7 @@ const {
 } = require("../../scripts/statistics");
 const val = mongoose.Types.ObjectId("61dc6d180dea196d5fdf0bf4");
 
-route.get("/", async (req, res) => {
+route.get("/",authenticateToken, async (req, res) => {
   try {
     let inventoryEntries, salaries;
     const filteredQuery = req.query.startDate ? true : false;

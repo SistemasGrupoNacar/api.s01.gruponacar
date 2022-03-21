@@ -5,7 +5,7 @@ const { errors } = require("../../middleware/errors");
 let { authenticateToken } = require("../../middleware/auth");
 const { body, param, validationResult } = require("express-validator");
 
-route.get("/", async (req, res) => {
+route.get("/", authenticateToken, async (req, res) => {
   try {
     let extraMoves = await ExtraMove.find()
       // Popular con typeMove
@@ -31,6 +31,7 @@ route.post(
   body("date").isISO8601().withMessage("Fecha no válida"),
   body("total").notEmpty().withMessage("Total es requerido"),
   body("total").isNumeric().withMessage("Total debe ser un número"),
+  authenticateToken,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -62,6 +63,7 @@ route.put(
   param("id").isMongoId().withMessage("Id debe ser un id valido"),
   // Validar el parametro type
   param("type").isMongoId().withMessage("Tipo debe ser un id valido"),
+  authenticateToken,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -93,6 +95,7 @@ route.put(
   "/:id",
   body("total").notEmpty().withMessage("Total es requerido"),
   body("total").isDecimal().withMessage("Total debe ser un número"),
+  authenticateToken,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -120,7 +123,7 @@ route.put(
   }
 );
 
-route.delete("/:id", async (req, res) => {
+route.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const extraMove = await ExtraMove.findByIdAndDelete(req.params.id);
     res.status(200).json(extraMove);

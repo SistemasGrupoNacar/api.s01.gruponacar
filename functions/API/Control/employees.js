@@ -6,8 +6,9 @@ const User = require("../../db/Models/General/User");
 const Role = require("../../db/Models/General/Role");
 const { createHash } = require("../../scripts/encrypt");
 const DEFAULT_PASSWORD = process.env.DEFAULT_PASSWORD;
+let { authenticateToken } = require("../../middleware/auth");
 
-router.get("/", async (req, res) => {
+router.get("/", authenticateToken, async (req, res) => {
   try {
     const employees = await Employee.find({ is_active: true })
       .populate("position", {
@@ -32,7 +33,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/all", async (req, res) => {
+router.get("/all", authenticateToken, async (req, res) => {
   try {
     const employees = await Employee.find()
       .populate("position", {
@@ -56,7 +57,7 @@ router.get("/all", async (req, res) => {
   }
 });
 
-router.get("/last", async (req, res) => {
+router.get("/last", authenticateToken, async (req, res) => {
   try {
     const employee = await Employee.find({ is_active: true })
       .populate("position", {
@@ -85,6 +86,7 @@ router.post(
   body("firstName").notEmpty().withMessage("Nombres son requeridos"),
   body("lastName").notEmpty().withMessage("Apellidos son requeridos"),
   body("position").notEmpty().withMessage("Posición es requerida"),
+  authenticateToken,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -172,6 +174,7 @@ router.put(
   "/:id/status/:status",
   param("status").notEmpty().withMessage("Estado es requerido"),
   param("status").isBoolean().withMessage("Estado debe ser booleano"),
+  authenticateToken,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -198,7 +201,7 @@ router.put(
   }
 );
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     const employee = await Employee.findById(id);

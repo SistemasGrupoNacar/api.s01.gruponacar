@@ -5,8 +5,10 @@ const { body, param } = require("express-validator");
 const { errors } = require("../../middleware/errors");
 const InventoryProduct = require("../../db/Models/Inventory/InventoryProduct");
 
+let { authenticateToken } = require("../../middleware/auth");
+
 // Obtiene todos los insumos habilitados
-route.get("/", async (req, res) => {
+route.get("/", authenticateToken, async (req, res) => {
   let inventoryProducts;
   // Si hay un limite en el query
   if (req.query.limit) {
@@ -22,7 +24,7 @@ route.get("/", async (req, res) => {
   return res.status(200).json(inventoryProducts);
 });
 // Obtiene todos los insumos sin restricciones
-route.get("/all", async (req, res) => {
+route.get("/all", authenticateToken, async (req, res) => {
   let inventoryProducts;
   // Si hay un limite en el query
   if (req.query.limit) {
@@ -37,7 +39,7 @@ route.get("/all", async (req, res) => {
 });
 
 // get specific inventory product
-route.get("/:id", async (req, res) => {
+route.get("/:id", authenticateToken, async (req, res) => {
   let inventoryProduct = await InventoryProduct.findById(req.params.id);
   if (!inventoryProduct) {
     return res.status(404).json({
@@ -49,7 +51,7 @@ route.get("/:id", async (req, res) => {
 });
 
 // obtener listado de productos con stock debajo del minimo
-route.get("/list/minStock", async (req, res) => {
+route.get("/list/minStock", authenticateToken, async (req, res) => {
   try {
     // obtener listado de productos
     let inventoryProducts = await InventoryProduct.find({
@@ -70,6 +72,7 @@ route.get("/list/minStock", async (req, res) => {
 
 route.post(
   "/",
+  authenticateToken,
   body("name").notEmpty().withMessage("El nombre no debe estar vacio"),
   body("description").exists(),
   body("min_stock")
@@ -102,6 +105,7 @@ route.post(
 // Actualizar availability de un producto
 route.put(
   "/:id/available/:availability",
+  authenticateToken,
   param("id").notEmpty().withMessage("El id no debe estar vacio"),
   param("availability")
     .notEmpty()
@@ -128,6 +132,7 @@ route.put(
 //actualizar producto
 route.put(
   "/:id",
+  authenticateToken,
   body("name").notEmpty().withMessage("El nombre no debe estar vacio"),
   body("description").exists(),
   body("min_stock")
@@ -171,6 +176,7 @@ route.put(
 //actualizar el costo de un producto
 route.put(
   "/:id/cost",
+  authenticateToken,
   body("cost").isNumeric().withMessage("El costo debe ser un numero"),
   body("cost").notEmpty().withMessage("El costo no debe estar vacio"),
   async (req, res) => {
@@ -197,7 +203,7 @@ route.put(
   }
 );
 
-route.delete("/:id", async (req, res) => {
+route.delete("/:id", authenticateToken, async (req, res) => {
   let inventoryProduct = await InventoryProduct.findById(req.params.id);
   if (!inventoryProduct) {
     return res.status(404).json({

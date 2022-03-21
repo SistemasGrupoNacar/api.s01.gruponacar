@@ -3,8 +3,9 @@ const route = express.Router();
 const { errors } = require("../../middleware/errors");
 const Role = require("../../db/Models/General/Role");
 const { body, validationResult } = require("express-validator");
+let { authenticateToken } = require("../../middleware/auth");
 
-route.get("/", async (req, res) => {
+route.get("/", authenticateToken, async (req, res) => {
   try {
     const roles = await Role.find({});
     return res.json(roles);
@@ -19,6 +20,7 @@ route.get("/", async (req, res) => {
 route.post(
   "/",
   body("title").notEmpty().withMessage("Titulo de rol es requerido"),
+  authenticateToken,
   async (req, res) => {
     errors.validationErrorResponse(req, res);
     try {
@@ -35,7 +37,7 @@ route.post(
   }
 );
 
-route.delete("/:id", async (req, res) => {
+route.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const role = await Role.findById(req.params.id);
     if (!role) {

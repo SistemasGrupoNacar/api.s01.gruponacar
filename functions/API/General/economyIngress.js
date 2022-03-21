@@ -12,10 +12,11 @@ const {
   getDataRangeIngress,
   maxAndMin,
 } = require("../../scripts/statistics");
+let { authenticateToken } = require("../../middleware/auth");
 const ExtraMove = require("../../db/Models/General/ExtraMove");
 // Se declara el valor del tipo de movimiento para ingresos
 var val = mongoose.Types.ObjectId("61dc6d250dea196d5fdf0bf7");
-route.get("/", async (req, res) => {
+route.get("/",authenticateToken, async (req, res) => {
   try {
     let sales;
     let extraMoves;

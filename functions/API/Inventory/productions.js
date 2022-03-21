@@ -4,8 +4,10 @@ const { body } = require("express-validator");
 const { errors } = require("../../middleware/errors");
 const Production = require("../../db/Models/Inventory/Production");
 
+let { authenticateToken } = require("../../middleware/auth");
+
 // En progreso
-route.get("/", async (req, res) => {
+route.get("/", authenticateToken, async (req, res) => {
   let productions = await Production.find({ in_progress: true })
     .sort({ _id: 1 })
     .populate("place", { description: 1, _id: 0 })
@@ -30,7 +32,7 @@ route.get("/", async (req, res) => {
 });
 
 // Todas
-route.get("/all", async (req, res) => {
+route.get("/all", authenticateToken, async (req, res) => {
   let productions = await Production.find({})
     .sort({ _id: 1 })
     .populate("place", { description: 1, _id: 0 })
@@ -55,7 +57,7 @@ route.get("/all", async (req, res) => {
 });
 
 //get production start between two dates
-route.get("/start/:startDate/:endDate", async (req, res) => {
+route.get("/start/:startDate/:endDate", authenticateToken, async (req, res) => {
   try {
     let productions = await Production.find({
       start_date: {
@@ -91,7 +93,7 @@ route.get("/start/:startDate/:endDate", async (req, res) => {
 });
 
 //get production finished between two dates
-route.get("/end/:startDate/:endDate", async (req, res) => {
+route.get("/end/:startDate/:endDate", authenticateToken, async (req, res) => {
   try {
     let productions = await Production.find({
       end_date: {
@@ -129,6 +131,7 @@ route.get("/end/:startDate/:endDate", async (req, res) => {
 
 route.post(
   "/",
+  authenticateToken,
   body("product").notEmpty().withMessage("El producto no debe estar vacio"),
   body("start_date")
     .notEmpty()
@@ -157,6 +160,7 @@ route.post(
 // Finalizar produccion
 route.put(
   "/:id/finished",
+  authenticateToken,
   body("end_date")
     .notEmpty()
     .withMessage("La fecha de fin no debe estar vacia"),
@@ -241,7 +245,7 @@ route.put(
 );
 
 // Actualizar produccion en progreso
-route.put("/:id/inProgress", async (req, res) => {
+route.put("/:id/inProgress", authenticateToken, async (req, res) => {
   try {
     //buscar la produccion y actualizarla
     let response = await Production.findByIdAndUpdate(
@@ -263,7 +267,7 @@ route.put("/:id/inProgress", async (req, res) => {
   }
 });
 
-route.delete("/:id", async (req, res) => {
+route.delete("/:id", authenticateToken, async (req, res) => {
   const production = await Production.findById(req.params.id);
   if (!production) {
     return res.status(404).json({

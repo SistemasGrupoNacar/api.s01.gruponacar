@@ -5,7 +5,9 @@ const Salary = require("../../db/Models/Control/Salary");
 const Production = require("../../db/Models/Inventory/Production");
 const Employee = require("../../db/Models/Control/Employee");
 
-router.get("/", async (req, res) => {
+let { authenticateToken } = require("../../middleware/auth");
+
+router.get("/", authenticateToken, async (req, res) => {
   try {
     const salaries = await Salary.find()
       .sort({ createdAt: -1 })
@@ -31,7 +33,7 @@ router.get("/", async (req, res) => {
 });
 
 // Obtener ultimos salarios
-router.get("/last", async (req, res) => {
+router.get("/last", authenticateToken, async (req, res) => {
   try {
     const salaries = await Salary.find()
       .populate("production", {
@@ -55,7 +57,7 @@ router.get("/last", async (req, res) => {
 });
 
 // Obtener los salarios de un empleado solo de el mes actual
-router.get("/total/:employee", async (req, res) => {
+router.get("/total/:employee", authenticateToken, async (req, res) => {
   try {
     const { employee } = req.params;
     const employeeName = await Employee.findById(employee);
@@ -109,6 +111,7 @@ router.post(
   body("date").isISO8601().withMessage("Fecha no es válida"),
   body("amount").notEmpty().withMessage("Monto es requerido"),
   body("amount").isNumeric().withMessage("Monto no es válido"),
+  authenticateToken,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -140,7 +143,7 @@ router.post(
   }
 );
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const salary = await Salary.findById(req.params.id);
     if (!salary) {

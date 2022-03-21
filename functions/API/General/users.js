@@ -9,7 +9,7 @@ const { comparePassword, createHash } = require("../../scripts/encrypt.js");
 const Employee = require("../../db/Models/Control/Employee");
 const Journey = require("../../db/Models/Control/Journey");
 
-route.get("/", async (req, res) => {
+route.get("/", authenticateToken, async (req, res) => {
   try {
     let users = await User.find()
       .sort({ _id: 1 })
@@ -24,7 +24,7 @@ route.get("/", async (req, res) => {
 });
 
 // Obtener los ultimos usuarios registrados
-route.get("/last", async (req, res) => {
+route.get("/last", authenticateToken, async (req, res) => {
   try {
     const users = await User.find()
       .sort({ createdAt: -1 })
@@ -40,7 +40,7 @@ route.get("/last", async (req, res) => {
 });
 
 // Obtener usuario por id
-route.get("/:id", async (req, res) => {
+route.get("/:id", authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.findById(id).populate("role", {
@@ -67,6 +67,7 @@ route.post(
   body("username").notEmpty().withMessage("Usuario requerido"),
   body("password").notEmpty().withMessage("Contraseña requerida"),
   body("role").notEmpty().withMessage("Rol requerido"),
+  authenticateToken,
   async (req, res) => {
     errors.validationErrorResponse(req, res);
     const { username, password, role, avatar } = req.body;
@@ -110,6 +111,7 @@ route.post(
 route.post(
   "/verify-username",
   body("username").notEmpty().withMessage("Usuario requerido"),
+  authenticateToken,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -142,6 +144,7 @@ route.put(
   "/:username/change-password",
   body("password").notEmpty().withMessage("Contraseña requerida"),
   body("newPassword").notEmpty().withMessage("Nueva contraseña requerida"),
+  authenticateToken,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -185,6 +188,7 @@ route.put(
   body("newPassword")
     .isLength({ min: 6 })
     .withMessage("Contraseña nueva debe tener al menos 6 caracteres"),
+  authenticateToken,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -252,7 +256,7 @@ route.put(
   }
 );
 
-route.delete("/:id", async (req, res) => {
+route.delete("/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
   const user = await User.findById(id);
   if (!user) {

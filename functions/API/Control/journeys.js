@@ -3,8 +3,9 @@ const route = express.Router();
 const { body, validationResult } = require("express-validator");
 const Journey = require("../../db/Models/Control/Journey");
 const Employee = require("../../db/Models/Control/Employee");
+let { authenticateToken } = require("../../middleware/auth");
 
-route.get("/", async (req, res) => {
+route.get("/", authenticateToken, async (req, res) => {
   try {
     const journeys = await Journey.find()
       .populate("employee", {
@@ -25,7 +26,7 @@ route.get("/", async (req, res) => {
 });
 
 // Obtener jornada especifica por id
-route.get("/byId/:id", async (req, res) => {
+route.get("/byId/:id", authenticateToken, async (req, res) => {
   try {
     const journey = await Journey.findById(req.params.id).sort({
       createdAt: -1,
@@ -40,7 +41,7 @@ route.get("/byId/:id", async (req, res) => {
 });
 
 // Obtener las ultimas 5 jornadas
-route.get("/last", async (req, res) => {
+route.get("/last", authenticateToken, async (req, res) => {
   try {
     const journeys = await Journey.find()
       .populate("employee", {
@@ -62,7 +63,7 @@ route.get("/last", async (req, res) => {
 });
 
 // Obtener las jornadas en proceso
-route.get("/in-progress", async (req, res) => {
+route.get("/in-progress", authenticateToken, async (req, res) => {
   try {
     const journeys = await Journey.find({
       check_out: null,
@@ -85,7 +86,7 @@ route.get("/in-progress", async (req, res) => {
 });
 
 // Obtener las jornadas de un empleado en especifico
-route.get("/employee/:id", async (req, res) => {
+route.get("/employee/:id", authenticateToken, async (req, res) => {
   try {
     if (req.query.limit) {
       const limit = parseInt(req.query.limit);
@@ -113,6 +114,7 @@ route.post(
   body("check_in").notEmpty().withMessage("Hora de entrada es requerida"),
   body("check_in").isISO8601().withMessage("Hora de entrada no es válida"),
   body("coordinates").notEmpty().withMessage("Coordenadas son requeridas"),
+  authenticateToken,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -150,6 +152,7 @@ route.put(
   body("check_out").notEmpty().withMessage("Hora de salida es requerida"),
   body("check_out").isISO8601().withMessage("Hora de salida no es válida"),
   body("coordinates").notEmpty().withMessage("Coordenadas son requeridas"),
+  authenticateToken,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -180,7 +183,7 @@ route.put(
 );
 
 // Actualizar dia como no trabajado
-route.put("/:id/not_worked", async (req, res) => {
+route.put("/:id/not_worked", authenticateToken, async (req, res) => {
   try {
     const response = await Journey.findByIdAndUpdate(
       req.params.id,
@@ -199,7 +202,7 @@ route.put("/:id/not_worked", async (req, res) => {
 });
 
 // Actualizar dia como trabajado
-route.put("/:id/worked", async (req, res) => {
+route.put("/:id/worked", authenticateToken, async (req, res) => {
   try {
     const response = await Journey.findByIdAndUpdate(
       req.params.id,
@@ -218,7 +221,7 @@ route.put("/:id/worked", async (req, res) => {
 });
 
 // Eliminar jornada
-route.delete("/:id", async (req, res) => {
+route.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const journey = await Journey.findById(req.params.id);
     // Eliminar del array de empleados la jornada

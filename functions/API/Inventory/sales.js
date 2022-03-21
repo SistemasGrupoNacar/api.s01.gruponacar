@@ -7,8 +7,9 @@ const Sale = require("../../db/Models/Inventory/Sale");
 const DetailSale = require("../../db/Models/Inventory/DetailSale");
 const Production = require("../../db/Models/Inventory/Production");
 const { log } = require("console");
+let { authenticateToken } = require("../../middleware/auth");
 
-route.get("/", async (req, res) => {
+route.get("/", authenticateToken, async (req, res) => {
   try {
     let sale;
     // Verifica si no tiene limit
@@ -43,7 +44,7 @@ route.get("/", async (req, res) => {
 });
 
 // Obtener las ventas de hoy
-route.get("/today", async (req, res) => {
+route.get("/today", authenticateToken, async (req, res) => {
   try {
     const today = new Date();
     const todayNow = today.toISOString();
@@ -70,7 +71,7 @@ route.get("/today", async (req, res) => {
 });
 
 // Obtener las ventas pendientes
-route.get("/pending", async (req, res) => {
+route.get("/pending", authenticateToken, async (req, res) => {
   try {
     const sale = await Sale.find({ pending: true }).sort({ date: -1 });
     return res.status(200).json(sale);
@@ -83,7 +84,7 @@ route.get("/pending", async (req, res) => {
 });
 
 // Obtener todas las ventas sin restricciones
-route.get("/all", async (req, res) => {
+route.get("/all", authenticateToken, async (req, res) => {
   try {
     let sale;
     // Verifica si no tiene limit
@@ -119,7 +120,7 @@ route.get("/all", async (req, res) => {
 });
 
 // Obtener venta especifica
-route.get("/unique/:id", async (req, res) => {
+route.get("/unique/:id", authenticateToken, async (req, res) => {
   try {
     // Las que tengan status true
     const sale = await Sale.findById(req.params.id).populate({
@@ -137,7 +138,7 @@ route.get("/unique/:id", async (req, res) => {
 });
 
 // obtener las ventas entre un rango de fechas
-route.get("/:startDate/:endDate", async (req, res) => {
+route.get("/:startDate/:endDate", authenticateToken, async (req, res) => {
   try {
     const { startDate, endDate } = req.params;
     const sale = await Sale.find({
@@ -173,7 +174,7 @@ route.get("/:startDate/:endDate", async (req, res) => {
 });
 
 // obtener las ventas entre un rango de fechas sin restricciones
-route.get("/:startDate/:endDate/all", async (req, res) => {
+route.get("/:startDate/:endDate/all", authenticateToken, async (req, res) => {
   try {
     const { startDate, endDate } = req.params;
     const sale = await Sale.find({
@@ -209,6 +210,7 @@ route.get("/:startDate/:endDate/all", async (req, res) => {
 
 route.post(
   "/",
+  authenticateToken,
   body("date").notEmpty().withMessage("Fecha es requerida"),
   body("date").isISO8601().withMessage("Fecha no valida"),
   async (req, res) => {
@@ -237,6 +239,7 @@ route.post(
 
 route.put(
   "/:id/:status",
+  authenticateToken,
   param("status").isBoolean().withMessage("Estado no es válido"),
   async (req, res) => {
     errors.validationErrorResponse(req, res);
@@ -260,6 +263,7 @@ route.put(
 // Cambiar el estado pendiente de una venta
 route.put(
   "/pending/:id/:status",
+  authenticateToken,
   param("status").isBoolean().withMessage("Estado no es válido"),
   async (req, res) => {
     try {
@@ -279,7 +283,7 @@ route.put(
   }
 );
 
-route.delete("/:id", async (req, res) => {
+route.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const sale = await Sale.findById(req.params.id);
 

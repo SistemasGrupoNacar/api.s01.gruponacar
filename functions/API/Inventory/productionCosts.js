@@ -6,7 +6,9 @@ const { errors } = require("../../middleware/errors");
 const ProductionCost = require("../../db/Models/Inventory/ProductionCost");
 const Production = require("../../db/Models/Inventory/Production");
 
-route.get("/", async (req, res) => {
+let { authenticateToken } = require("../../middleware/auth");
+
+route.get("/", authenticateToken, async (req, res) => {
   try {
     let productionCost = await ProductionCost.find()
       .sort({ _id: 1 })
@@ -24,6 +26,7 @@ route.get("/", async (req, res) => {
 // endpoint get productionCost between two dates
 route.get(
   "/:startDate/:endDate",
+  authenticateToken,
   param("startDate").isDate().withMessage("Fecha de inicio no es valida"),
   param("endDate").isDate().withMessage("Fecha de finalizacion no es valida"),
   async (req, res) => {
@@ -72,6 +75,7 @@ route.get(
 
 route.post(
   "/",
+  authenticateToken,
   body("production")
     .notEmpty()
     .withMessage("La produccion no debe estar vacia"),
@@ -110,7 +114,6 @@ route.post(
           message: "No hay suficiente insumo",
         });
       }
-      
 
       // Asigna los valores de precio unitario y total dependiendo de lo que marque el producto en inventario
       const unit_price = inventoryProduct.cost;
@@ -147,7 +150,7 @@ route.post(
   }
 );
 
-route.delete("/:id", async (req, res) => {
+route.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const response = await ProductionCost.findByIdAndDelete(req.params.id);
     const production = await Production.findById(response.production);

@@ -5,7 +5,9 @@ const { errors } = require("../../middleware/errors");
 const DetailSale = require("../../db/Models/Inventory/DetailSale");
 const { log } = require("console");
 
-route.get("/", async (req, res) => {
+let { authenticateToken } = require("../../middleware/auth");
+
+route.get("/", authenticateToken, async (req, res) => {
   try {
     const detailSale = await DetailSale.find({})
       .sort({ _id: 1 })
@@ -36,6 +38,7 @@ route.post(
     .withMessage("La cantidad debe ser mayor o igual a 1"),
   body("sub_total").isNumeric().withMessage("Sub total no es válido"),
   body("total").isNumeric().withMessage("Total no es válido"),
+  authenticateToken,
   async (req, res) => {
     //validacion de errores
     errors.validationErrorResponse(req, res);
@@ -109,6 +112,7 @@ route.post(
 
 route.put(
   "/:id/costs",
+  authenticateToken,
   body("quantity").notEmpty().withMessage("Cantidad es requerida"),
   body("sub_total").notEmpty().withMessage("Sub total es requerido"),
   body("total").notEmpty().withMessage("Total es requerido"),
@@ -161,7 +165,7 @@ route.put(
   }
 );
 
-route.delete("/:id", async (req, res) => {
+route.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const response = await DetailSale.findByIdAndDelete(req.params.id);
     await Sale.findByIdAndUpdate(response.sale, {

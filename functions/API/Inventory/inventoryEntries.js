@@ -5,8 +5,9 @@ const mongoose = require("mongoose");
 const { body, validationResult } = require("express-validator");
 const { errors } = require("../../middleware/errors");
 const InventoryProduct = require("../../db/Models/Inventory/InventoryProduct");
+let { authenticateToken } = require("../../middleware/auth");
 
-route.get("/", async (req, res) => {
+route.get("/", authenticateToken, async (req, res) => {
   // Verifica si hay un limite en el query
   let inventoryEntries;
   if (req.query.limit) {
@@ -30,6 +31,7 @@ route.get("/", async (req, res) => {
 
 route.post(
   "/",
+  authenticateToken,
   body("inventory_product")
     .notEmpty()
     .withMessage("Producto de Inventario es requerido"),
@@ -107,7 +109,7 @@ route.post(
   }
 );
 
-route.delete("/:id", async (req, res) => {
+route.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const inventoryEntry = await InventoryEntry.findById(req.params.id);
     if (!inventoryEntry) {

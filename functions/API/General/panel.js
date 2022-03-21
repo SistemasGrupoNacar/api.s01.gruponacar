@@ -11,7 +11,9 @@ const ID_INGRESS = mongoose.Types.ObjectId("61dc6d250dea196d5fdf0bf7");
 const totalFormat = require("../../scripts/total");
 const statistics = require("../../scripts/statistics");
 
-route.get("/", async (req, res) => {
+let { authenticateToken } = require("../../middleware/auth");
+
+route.get("/", authenticateToken, async (req, res) => {
   let egressMonth = {};
   let ingressMonth = {};
 

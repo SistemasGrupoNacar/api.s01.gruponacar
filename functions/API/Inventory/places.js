@@ -4,21 +4,25 @@ const Place = require("../../db/Models/Inventory/Place");
 const Production = require("../../db/Models/Inventory/Production");
 const { body } = require("express-validator");
 const { errors } = require("../../middleware/errors");
+4;
+
+let { authenticateToken } = require("../../middleware/auth");
 
 // Con restriccion de availability
-route.get("/", async (req, res) => {
+route.get("/", authenticateToken, async (req, res) => {
   let places = await Place.find({ availability: true }).sort({ _id: 1 });
   return res.status(200).json(places);
 });
 
 // Sin restriccion de availability
-route.get("/all", async (req, res) => {
+route.get("/all", authenticateToken, async (req, res) => {
   let places = await Place.find({}).sort({ _id: 1 });
   return res.status(200).json(places);
 });
 
 route.post(
   "/",
+  authenticateToken,
   body("description")
     .notEmpty()
     .withMessage("La descripcion no debe estar vacia"),
@@ -40,7 +44,7 @@ route.post(
   }
 );
 
-route.put("/:id/:availability", async (req, res) => {
+route.put("/:id/:availability", authenticateToken, async (req, res) => {
   errors.validationErrorResponse(req, res);
   try {
     const response = await Place.findByIdAndUpdate(
@@ -59,7 +63,7 @@ route.put("/:id/:availability", async (req, res) => {
   }
 });
 
-route.put("/:id", async (req, res) => {
+route.put("/:id", authenticateToken, async (req, res) => {
   errors.validationErrorResponse(req, res);
   const { description } = req.body;
   const response = await Place.findByIdAndUpdate(
@@ -72,7 +76,7 @@ route.put("/:id", async (req, res) => {
   return res.status(200).json(response);
 });
 
-route.delete("/:id", async (req, res) => {
+route.delete("/:id", authenticateToken, async (req, res) => {
   try {
     // Primero verifica si el lugar no se esta ocupando en alguna produccion
     const productions = await Production.find({ place: req.params.id });

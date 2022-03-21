@@ -7,8 +7,10 @@ const Product = require("../../db/Models/Inventory/Product");
 const { log } = require("console");
 const Production = require("../../db/Models/Inventory/Production");
 
+let { authenticateToken } = require("../../middleware/auth");
+
 // con restriccion de availability
-route.get("/", async (req, res) => {
+route.get("/", authenticateToken, async (req, res) => {
   let products;
   // Si hay un limite en el query
   if (req.query.limit) {
@@ -21,7 +23,7 @@ route.get("/", async (req, res) => {
 });
 
 // sin restriccion de availability
-route.get("/all", async (req, res) => {
+route.get("/all", authenticateToken, async (req, res) => {
   let products;
   // Si hay un limite en el query
   if (req.query.limit) {
@@ -34,7 +36,7 @@ route.get("/all", async (req, res) => {
 });
 
 // Obtener producto en especifico
-route.get("/:id", async (req, res) => {
+route.get("/:id", authenticateToken, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     return res.status(200).json(product);
@@ -48,6 +50,7 @@ route.get("/:id", async (req, res) => {
 
 route.post(
   "/",
+  authenticateToken,
   body("name").notEmpty().withMessage("El nombre no debe estar vacio"),
   body("unitOfMeasurement")
     .notEmpty()
@@ -78,6 +81,7 @@ route.post(
 
 route.put(
   "/:id/available/:availability",
+  authenticateToken,
   param("id").notEmpty().withMessage("El id no debe estar vacio"),
   param("availability")
     .notEmpty()
@@ -110,6 +114,7 @@ route.put(
 
 route.put(
   "/:id/stock/:stock",
+  authenticateToken,
   param("id").notEmpty().withMessage("El id no debe estar vacio"),
   param("stock").notEmpty().withMessage("El stock no debe estar vacio"),
   param("stock").isInt({ min: 1 }).withMessage("El stock debe ser un numero"),
@@ -131,6 +136,7 @@ route.put(
 
 route.put(
   "/:id/description",
+  authenticateToken,
   body("description")
     .notEmpty()
     .withMessage("La descripcion no debe estar vacia"),
@@ -150,7 +156,7 @@ route.put(
   }
 );
 
-route.delete("/:id", async (req, res) => {
+route.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     // Verifica si todavia tiene stock

@@ -5,7 +5,7 @@ const { body } = require("express-validator");
 const TypeMove = require("../../db/Models/General/TypeMove");
 let { authenticateToken } = require("../../middleware/auth");
 
-route.get("/", async (req, res) => {
+route.get("/", authenticateToken, async (req, res) => {
   let typeMove = await TypeMove.find().sort({ _id: 1 });
   return res.status(200).json(typeMove);
 });
@@ -13,6 +13,7 @@ route.get("/", async (req, res) => {
 route.post(
   "/",
   body("title").notEmpty().withMessage("El titulo no debe estar vacio"),
+  authenticateToken,
   async (req, res) => {
     errors.validationErrorResponse(req, res);
     try {
@@ -34,6 +35,7 @@ route.post(
 route.put(
   "/:id",
   body("title").notEmpty().withMessage("El titulo no debe estar vacio"),
+  authenticateToken,
   async (req, res) => {
     errors.validationErrorResponse(req, res);
     const { id } = req.params;
@@ -58,7 +60,7 @@ route.put(
   }
 );
 
-route.delete("/:id",authenticateToken, async (req, res) => {
+route.delete("/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
   try {
     let typeMove = await TypeMove.findById(id);

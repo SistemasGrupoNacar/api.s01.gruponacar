@@ -2,9 +2,10 @@ const express = require("express");
 const route = express.Router();
 const { body, validationResult } = require("express-validator");
 const Position = require("../../db/Models/Control/Position");
+let { authenticateToken } = require("../../middleware/auth");
 
 //Obtiene todas las posiciones
-route.get("/", async (req, res) => {
+route.get("/", authenticateToken, async (req, res) => {
   try {
     const positions = await Position.find();
     return res.status(200).json(positions);
@@ -22,6 +23,7 @@ route.post(
   body("description")
     .notEmpty()
     .withMessage("El campo descripcion es requerido"),
+  authenticateToken,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -50,6 +52,7 @@ route.put(
   body("description")
     .notEmpty()
     .withMessage("El campo descripcion es requerido"),
+  authenticateToken,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -76,7 +79,7 @@ route.put(
 );
 
 // Elimina una posicion
-route.delete("/:id", async (req, res) => {
+route.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     const position = await Position.findById(id);

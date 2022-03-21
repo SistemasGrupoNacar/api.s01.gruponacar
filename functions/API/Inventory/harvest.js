@@ -6,7 +6,9 @@ const Harvest = require("../../db/Models/Inventory/Harvest");
 const Product = require("../../db/Models/Inventory/Product");
 const Production = require("../../db/Models/Inventory/Production");
 
-route.get("/", async (req, res) => {
+let { authenticateToken } = require("../../middleware/auth");
+
+route.get("/", authenticateToken, async (req, res) => {
   try {
     // Verifica si hay un limite en el query
     let harvest;
@@ -34,7 +36,7 @@ route.get("/", async (req, res) => {
 });
 
 // endpoint get harvest between two dates
-route.get("/:startDate/:endDate", async (req, res) => {
+route.get("/:startDate/:endDate", authenticateToken, async (req, res) => {
   try {
     const harvest = await Harvest.find({
       date: {
@@ -70,6 +72,7 @@ route.get("/:startDate/:endDate", async (req, res) => {
 
 route.post(
   "/",
+  authenticateToken,
   body("production").notEmpty().withMessage("Producción es requerida"),
   body("quantity").notEmpty().withMessage("Cantidad es requerida"),
   body("date").notEmpty().withMessage("Fecha es requerida"),
@@ -118,7 +121,7 @@ route.post(
   }
 );
 
-route.delete("/:id", async (req, res) => {
+route.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const harvest = await Harvest.findById(req.params.id);
     if (!harvest) {
