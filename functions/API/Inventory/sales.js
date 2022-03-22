@@ -6,6 +6,7 @@ const { errors } = require("../../middleware/errors");
 const Sale = require("../../db/Models/Inventory/Sale");
 const DetailSale = require("../../db/Models/Inventory/DetailSale");
 const Production = require("../../db/Models/Inventory/Production");
+const User = require("../../db/Models/General/User");
 const { log } = require("console");
 let { authenticateToken } = require("../../middleware/auth");
 
@@ -23,6 +24,10 @@ route.get("/", authenticateToken, async (req, res) => {
           populate: { path: "product", select: "name" },
           select: "quantity sub_total total production",
         })
+        .populate({
+          path: "created_by",
+          select: "username",
+        })
         .limit(limit);
     } else {
       sale = await Sale.find({ status: true })
@@ -31,6 +36,10 @@ route.get("/", authenticateToken, async (req, res) => {
           path: "detail_sale",
           populate: { path: "product", select: "name" },
           select: "quantity sub_total total production",
+        })
+        .populate({
+          path: "created_by",
+          select: "username",
         });
     }
 
@@ -59,6 +68,10 @@ route.get("/today", authenticateToken, async (req, res) => {
         path: "detail_sale",
         populate: { path: "product", select: "name" },
         select: "quantity sub_total total production",
+      })
+      .populate({
+        path: "created_by",
+        select: "username",
       })
       .sort({ date: -1 });
     return res.status(200).json(sales);
@@ -98,6 +111,10 @@ route.get("/all", authenticateToken, async (req, res) => {
           populate: { path: "product", select: "name" },
           select: "quantity sub_total total production",
         })
+        .populate({
+          path: "created_by",
+          select: "username",
+        })
         .limit(limit);
     } else {
       // Las que tengan status true
@@ -107,6 +124,10 @@ route.get("/all", authenticateToken, async (req, res) => {
           path: "detail_sale",
           populate: { path: "product", select: "name" },
           select: "quantity sub_total total production",
+        })
+        .populate({
+          path: "created_by",
+          select: "username",
         });
     }
 
@@ -126,7 +147,8 @@ route.get("/unique/:id", authenticateToken, async (req, res) => {
     const sale = await Sale.findById(req.params.id).populate({
       path: "detail_sale",
       populate: { path: "product", select: "name" },
-      select: "quantity sub_total total production",
+      select:
+        "quantity sub_total total production sub_total_format total_format",
     });
     return res.status(200).json(sale);
   } catch (error) {
@@ -219,15 +241,44 @@ route.post(
       return res.status(422).json({ errors: errors.array() });
     }
     const { date, description } = req.body;
+    const { _id } = req.user;
     const sale = new Sale({
       description,
       date,
       status: true,
+      created_by: _id,
     });
     try {
       const response = await sale.save();
 
       return res.status(201).json(response);
+    } catch (error) {
+      return res.status(500).json({
+        name: error.name,
+        message: error.message,
+      });
+    }
+  }
+);
+
+// Cambiar el estado pendiente de una venta
+route.put(
+  "/pending/:id/:status",
+  param("status").isBoolean().withMessage("Estado no es válido"),
+  authenticateToken,
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json(errors);
+    }
+    try {
+      const { id, status } = req.params;
+      const response = await Sale.findByIdAndUpdate(
+        id,
+        { pending: status },
+        { new: true }
+      );
+      return res.status(200).json(response);
     } catch (error) {
       return res.status(500).json({
         name: error.name,
@@ -248,29 +299,6 @@ route.put(
       const response = await Sale.findByIdAndUpdate(
         id,
         { status },
-        { new: true }
-      );
-      return res.status(200).json(response);
-    } catch (error) {
-      return res.status(500).json({
-        name: error.name,
-        message: error.message,
-      });
-    }
-  }
-);
-
-// Cambiar el estado pendiente de una venta
-route.put(
-  "/pending/:id/:status",
-  authenticateToken,
-  param("status").isBoolean().withMessage("Estado no es válido"),
-  async (req, res) => {
-    try {
-      const { id, status } = req.params;
-      const response = await Sale.findByIdAndUpdate(
-        id,
-        { pending: status },
         { new: true }
       );
       return res.status(200).json(response);

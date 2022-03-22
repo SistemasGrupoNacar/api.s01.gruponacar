@@ -32,6 +32,11 @@ const sale = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    created_by: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
   },
   {
     timestamps: true,
