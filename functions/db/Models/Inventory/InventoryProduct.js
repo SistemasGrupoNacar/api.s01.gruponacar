@@ -21,6 +21,10 @@ const inventoryProduct = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    unit_of_measurement: {
+      type: String,
+      required: true,
+    },
     availability: {
       type: Boolean,
       required: true,

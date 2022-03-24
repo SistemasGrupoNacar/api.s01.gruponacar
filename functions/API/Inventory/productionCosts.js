@@ -84,7 +84,7 @@ route.post(
     .withMessage("El producto no debe estar vacio"),
   body("description").exists(),
   body("quantity").notEmpty().withMessage("La cantidad no debe estar vacia"),
-  body("quantity").isInt().withMessage("La cantidad debe ser un numero entero"),
+  body("quantity").isNumeric().withMessage("La cantidad debe ser un numero"),
   body("date").notEmpty().withMessage("La fecha no debe estar vacia"),
   body("date").isISO8601().withMessage("La fecha no es valida"),
   async (req, res) => {

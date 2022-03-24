@@ -1,7 +1,7 @@
 const express = require("express");
 const route = express.Router();
 const mongoose = require("mongoose");
-const { body, param } = require("express-validator");
+const { body, param, validationResult } = require("express-validator");
 const { errors } = require("../../middleware/errors");
 const InventoryProduct = require("../../db/Models/Inventory/InventoryProduct");
 
@@ -80,6 +80,9 @@ route.post(
     .withMessage("El stock minimo debe ser un numero entero"),
   body("cost").isNumeric().withMessage("El costo debe ser un numero"),
   body("cost").notEmpty().withMessage("El costo no debe estar vacio"),
+  body("unit_of_measurement")
+    .notEmpty()
+    .withMessage("La unidad de medida no debe estar vacia"),
   body("availability")
     .isBoolean()
     .withMessage("La disponibilidad debe ser booleano"),
@@ -87,18 +90,36 @@ route.post(
     .notEmpty()
     .withMessage("La disponibilidad no debe estar vacia"),
   async (req, res) => {
-    errors.validationErrorResponse(req, res);
-    const { name, description, min_stock, cost, availability } = req.body;
-    let inventoryProduct = new InventoryProduct({
-      name,
-      description,
-      stock: 0,
-      min_stock,
-      cost,
-      availability,
-    });
-    await inventoryProduct.save();
-    return res.status(201).json(inventoryProduct);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    try {
+      const {
+        name,
+        description,
+        min_stock,
+        cost,
+        availability,
+        unit_of_measurement,
+      } = req.body;
+      let inventoryProduct = new InventoryProduct({
+        name,
+        description,
+        stock: 0,
+        min_stock,
+        cost,
+        availability,
+        unit_of_measurement,
+      });
+      await inventoryProduct.save();
+      return res.status(201).json(inventoryProduct);
+    } catch (error) {
+      return res.status(500).json({
+        name: error.name,
+        message: error.message,
+      });
+    }
   }
 );
 
