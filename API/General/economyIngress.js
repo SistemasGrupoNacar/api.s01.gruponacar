@@ -37,7 +37,7 @@ route.get("/",authenticateToken, async (req, res) => {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date", timezone:"America/El_Salvador" } },
             total: { $sum: "$total" },
           },
         },
@@ -57,7 +57,7 @@ route.get("/",authenticateToken, async (req, res) => {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date", timezone:"America/El_Salvador" } },
             total: { $sum: "$total" },
           },
         },
@@ -76,7 +76,7 @@ route.get("/",authenticateToken, async (req, res) => {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date", timezone:"America/El_Salvador" } },
             total: { $sum: "$total" },
           },
         },
@@ -93,7 +93,7 @@ route.get("/",authenticateToken, async (req, res) => {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date", timezone:"America/El_Salvador" } },
             total: { $sum: "$total" },
           },
         },
