@@ -16,13 +16,14 @@ let { authenticateToken } = require("../../middleware/auth");
 const ExtraMove = require("../../db/Models/General/ExtraMove");
 // Se declara el valor del tipo de movimiento para ingresos
 var val = mongoose.Types.ObjectId("61dc6d250dea196d5fdf0bf7");
-route.get("/",authenticateToken, async (req, res) => {
+route.get("/", authenticateToken, async (req, res) => {
   try {
     let sales;
     let extraMoves;
     const filteredQuery = req.query.startDate ? true : false;
     // Verificando si consulta rangos de fechas
     if (req.query.startDate && req.query.endDate) {
+      console.log(req.query.startDate);
       // Obtener las ventas y formatearlo con el rango de fecha dado
       sales = await Sales.aggregate([
         {
