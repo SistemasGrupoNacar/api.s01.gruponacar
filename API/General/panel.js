@@ -2,12 +2,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const route = express.Router();
 const Sales = require("../../db/Models/Inventory/Sale");
+const Salaries = require("../../db/Models/Control/Salary");
 const InventoryEntry = require("../../db/Models/Inventory/InventoryEntry");
 const ExtraMove = require("../../db/Models/General/ExtraMove");
+const TypesMove = require("../../db/Models/General/TypeMove");
 const InventoryProduct = require("../../db/Models/Inventory/InventoryProduct");
 const URL_SERVER = "https://us-central1-s01-gruponacar.cloudfunctions.net/api";
-const ID_EGRESS = mongoose.Types.ObjectId("61dc6d180dea196d5fdf0bf4");
-const ID_INGRESS = mongoose.Types.ObjectId("61dc6d250dea196d5fdf0bf7");
 const totalFormat = require("../../scripts/total");
 const statistics = require("../../scripts/statistics");
 
@@ -65,8 +65,30 @@ const getProductsWithLessStock = async () => {
 };
 
 const getEgress = async () => {
+  // Obtener el ObjectId de egresos
+  const { _id } = await TypesMove.findOne({ title: "egress" }).select({
+    _id: 1,
+  });
   // Obtener las entradas de insumos y formatearlo
   const inventoryEntries = await InventoryEntry.aggregate([
+    {
+      $group: {
+        _id: {
+          $dateToString: {
+            format: "%Y-%m-%d",
+            date: "$date",
+            timezone: "America/El_Salvador",
+          },
+        },
+        total: { $sum: "$total" },
+      },
+    },
+    {
+      $sort: { _id: 1 },
+    },
+  ]);
+  // Obtener los salarios
+  const salaries = await Salaries.aggregate([
     {
       $group: {
         _id: {
@@ -88,7 +110,7 @@ const getEgress = async () => {
   const extraMoves = await ExtraMove.aggregate([
     {
       $match: {
-        type_move: ID_EGRESS,
+        type_move: _id,
       },
     },
     {
@@ -107,11 +129,17 @@ const getEgress = async () => {
       $sort: { _id: 1 },
     },
   ]);
-  const response = await calcTotalByMonth(inventoryEntries.concat(extraMoves));
+  const response = await calcTotalByMonth(
+    inventoryEntries.concat(salaries.concat(extraMoves))
+  );
   return response;
 };
 
 const getIngress = async () => {
+  // Obtener el ObjectId de ingresos
+  const { _id } = await TypesMove.findOne({ title: "ingress" }).select({
+    _id: 1,
+  });
   // Obtener las ventas y formatearlo
   const sales = await Sales.aggregate([
     {
@@ -141,7 +169,7 @@ const getIngress = async () => {
   const extraMoves = await ExtraMove.aggregate([
     {
       $match: {
-        type_move: ID_INGRESS,
+        type_move: _id,
       },
     },
     {
