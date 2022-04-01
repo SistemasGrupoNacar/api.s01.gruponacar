@@ -19,7 +19,7 @@ const {
 } = require("../../scripts/statistics");
 const val = mongoose.Types.ObjectId("61dc6d180dea196d5fdf0bf4");
 
-route.get("/",authenticateToken, async (req, res) => {
+route.get("/", authenticateToken, async (req, res) => {
   try {
     let inventoryEntries, salaries;
     const filteredQuery = req.query.startDate ? true : false;
@@ -37,7 +37,13 @@ route.get("/",authenticateToken, async (req, res) => {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$date",
+                timezone: "America/El_Salvador",
+              },
+            },
             total: { $sum: "$total" },
           },
         },
@@ -57,7 +63,13 @@ route.get("/",authenticateToken, async (req, res) => {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$date",
+                timezone: "America/El_Salvador",
+              },
+            },
             total: { $sum: "$total" },
           },
         },
@@ -78,7 +90,13 @@ route.get("/",authenticateToken, async (req, res) => {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$date",
+                timezone: "America/El_Salvador",
+              },
+            },
             total: { $sum: "$total" },
           },
         },
@@ -91,7 +109,13 @@ route.get("/",authenticateToken, async (req, res) => {
       inventoryEntries = await InventoryEntry.aggregate([
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$date",
+                timezone: "America/El_Salvador",
+              },
+            },
             total: { $sum: "$total" },
           },
         },
@@ -103,7 +127,13 @@ route.get("/",authenticateToken, async (req, res) => {
       salaries = await Salary.aggregate([
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$date",
+                timezone: "America/El_Salvador",
+              },
+            },
             total: { $sum: "$total" },
           },
         },
@@ -120,7 +150,13 @@ route.get("/",authenticateToken, async (req, res) => {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$date",
+                timezone: "America/El_Salvador",
+              },
+            },
             total: { $sum: "$total" },
           },
         },
@@ -139,7 +175,7 @@ route.get("/",authenticateToken, async (req, res) => {
       );
     } else {
       // Obtiene los datos del rango de fecha dado
-      currentMonth = getDataRangeEgress(inventoryEntries, extraMoves);
+      currentMonth = getDataRangeEgress(inventoryEntries, salaries, extraMoves);
     }
     // Graficar datos
     const inventoryEntriesGraphic = graphic(inventoryEntries);
@@ -218,6 +254,10 @@ route.get("/",authenticateToken, async (req, res) => {
       inventoryEntries: {
         graphic: inventoryEntriesGraphic,
         total: totalInventoryEntries,
+        total_format: totalInventoryEntries.toLocaleString("en-US", {
+          style: "currency",
+          currency: "USD",
+        }),
         max: maxAndMinInventoryEntries.max._id,
         min: maxAndMinInventoryEntries.min._id,
         startDate: inventoryEntriesDates.startDate,
@@ -229,6 +269,10 @@ route.get("/",authenticateToken, async (req, res) => {
       salaries: {
         graphic: salariesGraphic,
         total: totalSalaries,
+        total_format: totalSalaries.toLocaleString("en-US", {
+          style: "currency",
+          currency: "USD",
+        }),
         max: maxAndMinSalaries.max._id,
         min: maxAndMinSalaries.min._id,
         startDate: salariesDates.startDate,
@@ -240,6 +284,10 @@ route.get("/",authenticateToken, async (req, res) => {
       extraMoves: {
         graphic: extraMovesGraphic,
         total: totalExtraMoves,
+        total_format: totalExtraMoves.toLocaleString("en-US", {
+          style: "currency",
+          currency: "USD",
+        }),
         max: maxAndMinExtraMoves.max._id,
         min: maxAndMinExtraMoves.min._id,
         startDate: extraMovesDates.startDate,

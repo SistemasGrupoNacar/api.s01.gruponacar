@@ -16,7 +16,7 @@ let { authenticateToken } = require("../../middleware/auth");
 const ExtraMove = require("../../db/Models/General/ExtraMove");
 // Se declara el valor del tipo de movimiento para ingresos
 var val = mongoose.Types.ObjectId("61dc6d250dea196d5fdf0bf7");
-route.get("/",authenticateToken, async (req, res) => {
+route.get("/", authenticateToken, async (req, res) => {
   try {
     let sales;
     let extraMoves;
@@ -37,7 +37,13 @@ route.get("/",authenticateToken, async (req, res) => {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$date",
+                timezone: "America/El_Salvador",
+              },
+            },
             total: { $sum: "$total" },
           },
         },
@@ -57,7 +63,13 @@ route.get("/",authenticateToken, async (req, res) => {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$date",
+                timezone: "America/El_Salvador",
+              },
+            },
             total: { $sum: "$total" },
           },
         },
@@ -76,7 +88,13 @@ route.get("/",authenticateToken, async (req, res) => {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$date",
+                timezone: "America/El_Salvador",
+              },
+            },
             total: { $sum: "$total" },
           },
         },
@@ -93,7 +111,13 @@ route.get("/",authenticateToken, async (req, res) => {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$date",
+                timezone: "America/El_Salvador",
+              },
+            },
             total: { $sum: "$total" },
           },
         },
