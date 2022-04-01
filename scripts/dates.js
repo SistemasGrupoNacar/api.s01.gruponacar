@@ -24,10 +24,16 @@ const getDates = (inventoryEntries) => {
 // Formatear fechas
 const formatDates = (startDate, endDate) => {
   var options = { year: "numeric", month: "long", day: "numeric" };
-  const startDateFormat = new Date(startDate).toLocaleString("es-ES", options);
-  const endDateFormat = new Date(endDate).toLocaleString("es-ES", options);
-
-  return { startDateFormat, endDateFormat };
+  if (typeof startDate === "undefined" || typeof endDate === "undefined") {
+    return { startDateFormat: "", endDateFormat: "" };
+  } else {
+    const startDateFormat = new Date(startDate).toLocaleString(
+      "es-ES",
+      options
+    );
+    const endDateFormat = new Date(endDate).toLocaleString("es-ES", options);
+    return { startDateFormat, endDateFormat };
+  }
 };
 
 module.exports = {

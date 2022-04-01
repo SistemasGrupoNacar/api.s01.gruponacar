@@ -23,7 +23,6 @@ route.get("/", authenticateToken, async (req, res) => {
     const filteredQuery = req.query.startDate ? true : false;
     // Verificando si consulta rangos de fechas
     if (req.query.startDate && req.query.endDate) {
-      console.log(req.query.startDate);
       // Obtener las ventas y formatearlo con el rango de fecha dado
       sales = await Sales.aggregate([
         {
@@ -38,7 +37,13 @@ route.get("/", authenticateToken, async (req, res) => {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date", timezone:"America/El_Salvador" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$date",
+                timezone: "America/El_Salvador",
+              },
+            },
             total: { $sum: "$total" },
           },
         },
@@ -58,7 +63,13 @@ route.get("/", authenticateToken, async (req, res) => {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date", timezone:"America/El_Salvador" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$date",
+                timezone: "America/El_Salvador",
+              },
+            },
             total: { $sum: "$total" },
           },
         },
@@ -77,7 +88,13 @@ route.get("/", authenticateToken, async (req, res) => {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date", timezone:"America/El_Salvador" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$date",
+                timezone: "America/El_Salvador",
+              },
+            },
             total: { $sum: "$total" },
           },
         },
@@ -94,7 +111,13 @@ route.get("/", authenticateToken, async (req, res) => {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date", timezone:"America/El_Salvador" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$date",
+                timezone: "America/El_Salvador",
+              },
+            },
             total: { $sum: "$total" },
           },
         },
