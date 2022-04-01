@@ -73,7 +73,13 @@ const getEgress = async () => {
   const inventoryEntries = await InventoryEntry.aggregate([
     {
       $group: {
-        _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+        _id: {
+          $dateToString: {
+            format: "%Y-%m-%d",
+            date: "$date",
+            timezone: "America/El_Salvador",
+          },
+        },
         total: { $sum: "$total" },
       },
     },
@@ -85,7 +91,13 @@ const getEgress = async () => {
   const salaries = await Salaries.aggregate([
     {
       $group: {
-        _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+        _id: {
+          $dateToString: {
+            format: "%Y-%m-%d",
+            date: "$date",
+            timezone: "America/El_Salvador",
+          },
+        },
         total: { $sum: "$total" },
       },
     },
@@ -103,7 +115,13 @@ const getEgress = async () => {
     },
     {
       $group: {
-        _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+        _id: {
+          $dateToString: {
+            format: "%Y-%m-%d",
+            date: "$date",
+            timezone: "America/El_Salvador",
+          },
+        },
         total: { $sum: "$total" },
       },
     },
@@ -132,7 +150,14 @@ const getIngress = async () => {
     },
     {
       $group: {
-        _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+        _id: {
+          $dateToString: {
+            format: "%Y-%m-%d",
+            date: "$date",
+            timezone: "America/El_Salvador",
+            timezone: "America/El_Salvador",
+          },
+        },
         total: { $sum: "$total" },
       },
     },
@@ -149,7 +174,13 @@ const getIngress = async () => {
     },
     {
       $group: {
-        _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+        _id: {
+          $dateToString: {
+            format: "%Y-%m-%d",
+            date: "$date",
+            timezone: "America/El_Salvador",
+          },
+        },
         total: { $sum: "$total" },
       },
     },
