@@ -74,8 +74,8 @@ router.post(
         const newJourney = new Journey({
           employee: employee._id,
           check_in: date,
-          inCoordinatesLat: coordinates.lat,
-          inCoordinatesLng: coordinates.lng,
+          in_coordinates_lat: coordinates.lat,
+          in_coordinates_lng: coordinates.lng,
         });
         const response = await newJourney.save();
         // Agrega el registro de entrada al empleado
@@ -102,8 +102,8 @@ router.post(
         // Crea el registro de salida
         journey.check_out = date;
         journey.was_worked = true;
-        journey.outCoordinatesLat = coordinates.lat;
-        journey.outCoordinatesLng = coordinates.lng;
+        journey.out_coordinates_lat = coordinates.lat;
+        journey.out_coordinates_lng = coordinates.lng;
         const response = await journey.save();
         return res.status(200).json(response);
       } else {

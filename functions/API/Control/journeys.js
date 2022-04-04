@@ -110,7 +110,7 @@ route.get("/employee/:id", authenticateToken, async (req, res) => {
 
 route.post(
   "/",
-  body("employee").notEmpty().withMessage("Empleado es requerido"),
+  body("username").notEmpty().withMessage("Empleado es requerido"),
   body("check_in").notEmpty().withMessage("Hora de entrada es requerida"),
   body("check_in").isISO8601().withMessage("Hora de entrada no es válida"),
   body("coordinates").notEmpty().withMessage("Coordenadas son requeridas"),
@@ -122,7 +122,32 @@ route.post(
     }
 
     try {
-      const { employee, check_in, coordinates } = req.body;
+      const { username, check_in, coordinates } = req.body;
+      // Buscar el empleado por el usuario
+      const employee = await Employee.findOne({ username });
+      if (!employee) {
+        return res.status(404).json({
+          message: "Empleado no encontrado",
+        });
+      }
+      // Verifica si el empleado esta activo
+      if (!employee.is_active) {
+        return res.status(400).json({
+          message: "El empleado no esta activo",
+        });
+      }
+      // Verifica si el usuario ya tiene un registro abierto
+      const journey = await Journey.findOne({
+        employee: employee._id,
+      }).sort({ createdAt: -1 });
+      if (journey != null) {
+        if (journey.check_out == null) {
+          return res.status(403).json({
+            message: "El usuario ya tiene un registro abierto",
+          });
+        }
+      }
+
       const journeyModel = new Journey({
         employee: employee,
         check_in: check_in,
@@ -160,18 +185,43 @@ route.put(
     }
 
     try {
-      const { check_out, description, was_worked, coordinates } = req.body;
-      const response = await Journey.findByIdAndUpdate(
-        req.params.id,
-        {
-          check_out,
-          description,
-          was_worked,
-          out_coordinates_lat: coordinates.lat,
-          out_coordinates_lng: coordinates.lng,
-        },
-        { new: true }
-      );
+      const employee = await Employee.findById(req.params.id);
+      if (!employee) {
+        return res.status(404).json({
+          message: "Empleado no encontrado",
+        });
+      }
+      // Verifica si el empleado esta activo
+      if (!employee.is_active) {
+        return res.status(400).json({
+          message: "El empleado no esta activo",
+        });
+      }
+      // Verifica si el usuario ya tiene un registro abierto
+      const journey = await Journey.findOne({
+        employee: employee._id,
+      }).sort({ createdAt: -1 });
+      if (journey == null) {
+        return res.status(404).json({
+          message: "No se encontro el registro",
+        });
+      }
+      if (journey.check_out != null) {
+        return res.status(403).json({
+          message: "El usuario ya tiene un registro cerrado",
+        });
+      }
+
+      const { check_out, description, coordinates } = req.body;
+      // Obtener joranda por empleado
+      const journeyModel = await Journey.findOne({
+        employee: employee._id,
+      }).sort({ createdAt: -1 });
+      journeyModel.check_out = check_out;
+      journeyModel.out_coordinates_lat = coordinates.lat;
+      journeyModel.out_coordinates_lng = coordinates.lng;
+      journeyModel.description = description || "";
+      const response = await journeyModel.save();
       return res.status(200).json(response);
     } catch (error) {
       return res.status(500).json({
