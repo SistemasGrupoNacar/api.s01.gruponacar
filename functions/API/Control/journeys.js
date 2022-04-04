@@ -3,6 +3,7 @@ const route = express.Router();
 const { body, validationResult } = require("express-validator");
 const Journey = require("../../db/Models/Control/Journey");
 const Employee = require("../../db/Models/Control/Employee");
+const User = require("../../db/Models/General/User");
 let { authenticateToken } = require("../../middleware/auth");
 
 route.get("/", authenticateToken, async (req, res) => {
@@ -123,8 +124,11 @@ route.post(
 
     try {
       const { username, check_in, coordinates } = req.body;
+      // Obtener el id del usuario
+      const user = await User.findOne({ username });
+
       // Buscar el empleado por el usuario
-      const employee = await Employee.findOne({ username });
+      const employee = await Employee.findOne({ user: user._id });
       if (!employee) {
         return res.status(404).json({
           message: "Empleado no encontrado",
