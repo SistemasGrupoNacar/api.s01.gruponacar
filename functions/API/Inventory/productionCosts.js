@@ -11,7 +11,23 @@ route.get("/", authenticateToken, async (req, res) => {
   try {
     let productionCost = await ProductionCost.find()
       .sort({ _id: 1 })
-      .populate("inventory_product", { name: 1 })
+      .populate("inventory_product", { name: 1 });
+    return res.status(200).json(productionCost);
+  } catch (err) {
+    return res.status(500).json({
+      name: err.name,
+      message: err.message,
+    });
+  }
+});
+
+// Obtiene ultimos 5 registros de costos de produccion
+route.get("/last", authenticateToken, async (req, res) => {
+  try {
+    let productionCost = await ProductionCost.find()
+      .sort({ date: -1 })
+      .limit(5)
+      .populate("inventory_product", { name: 1 });
     return res.status(200).json(productionCost);
   } catch (err) {
     return res.status(500).json({
@@ -36,7 +52,7 @@ route.get(
         },
       })
         .sort({ _id: 1 })
-        .populate("inventory_product", { name: 1 })
+        .populate("inventory_product", { name: 1 });
       //count total productionCost
       let totalProductionCost = await ProductionCost.aggregate([
         {
@@ -87,8 +103,7 @@ route.post(
       return res.status(422).json({ errors: errors.array() });
     }
     // Obtiene los datos del post
-    const {  inventory_product, quantity, description, date } =
-      req.body;
+    const { inventory_product, quantity, description, date } = req.body;
 
     try {
       // Obtiene el producto de inventario de la base de datos
@@ -109,21 +124,15 @@ route.post(
         });
       }
 
-      // Asigna los valores de precio unitario y total dependiendo de lo que marque el producto en inventario
-      const unit_price = inventoryProduct.cost;
-      const total = quantity * unit_price;
       // Crea el modelo de costo de produccion
       let productionCost = new ProductionCost({
-        
         inventory_product,
         description,
         quantity,
         date,
-        unit_price,
-        total,
       });
       let response = await productionCost.save();
-      
+
       //actualizar stock de inventoryProduct
       await InventoryProduct.findByIdAndUpdate(inventory_product, {
         $inc: {
@@ -143,7 +152,7 @@ route.post(
 route.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const response = await ProductionCost.findByIdAndDelete(req.params.id);
-    
+
     //actualizar stock de inventoryProduct
     await InventoryProduct.findByIdAndUpdate(response.inventory_product, {
       $inc: {

@@ -198,6 +198,10 @@ route.get("/", authenticateToken, async (req, res) => {
       sales: {
         graphic: salesGraphic,
         total: totalSales,
+        total_format: totalSales.toLocaleString("en-US", {
+          style: "currency",
+          currency: "USD",
+        }),
         max: maxAndMinSales.max._id,
         min: maxAndMinSales.min._id,
         startDate: salesDates.startDate,
@@ -209,6 +213,10 @@ route.get("/", authenticateToken, async (req, res) => {
       extraMoves: {
         graphic: extraMovesGraphic,
         total: totalExtraMoves,
+        total_format: totalExtraMoves.toLocaleString("en-US", {
+          style: "currency",
+          currency: "USD",
+        }),
         max: maxAndMinExtraMoves.max._id,
         min: maxAndMinExtraMoves.min._id,
         startDate: extraMovesDates.startDate,
