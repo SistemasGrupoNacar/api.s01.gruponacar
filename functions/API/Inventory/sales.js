@@ -22,7 +22,7 @@ route.get("/", authenticateToken, async (req, res) => {
         .populate({
           path: "detail_sale",
           populate: { path: "product", select: "name" },
-          select: "quantity sub_total total production",
+          select: "quantity sub_total total ",
         })
         .populate({
           path: "created_by",
@@ -35,7 +35,7 @@ route.get("/", authenticateToken, async (req, res) => {
         .populate({
           path: "detail_sale",
           populate: { path: "product", select: "name" },
-          select: "quantity sub_total total production",
+          select: "quantity sub_total total ",
         })
         .populate({
           path: "created_by",
@@ -67,7 +67,7 @@ route.get("/today", authenticateToken, async (req, res) => {
       .populate({
         path: "detail_sale",
         populate: { path: "product", select: "name" },
-        select: "quantity sub_total total production",
+        select: "quantity sub_total total ",
       })
       .populate({
         path: "created_by",
@@ -109,7 +109,7 @@ route.get("/all", authenticateToken, async (req, res) => {
         .populate({
           path: "detail_sale",
           populate: { path: "product", select: "name" },
-          select: "quantity sub_total total production",
+          select: "quantity sub_total total ",
         })
         .populate({
           path: "created_by",
@@ -123,7 +123,7 @@ route.get("/all", authenticateToken, async (req, res) => {
         .populate({
           path: "detail_sale",
           populate: { path: "product", select: "name" },
-          select: "quantity sub_total total production",
+          select: "quantity sub_total total ",
         })
         .populate({
           path: "created_by",
@@ -147,8 +147,7 @@ route.get("/unique/:id", authenticateToken, async (req, res) => {
     const sale = await Sale.findById(req.params.id).populate({
       path: "detail_sale",
       populate: { path: "product", select: "name" },
-      select:
-        "quantity sub_total total production sub_total_format total_format",
+      select: "quantity sub_total total  sub_total_format total_format",
     });
     return res.status(200).json(sale);
   } catch (error) {
@@ -174,7 +173,7 @@ route.get("/:startDate/:endDate", authenticateToken, async (req, res) => {
       .populate({
         path: "detail_sale",
         populate: { path: "product", select: "name" },
-        select: "quantity sub_total total production",
+        select: "quantity sub_total total ",
       });
     //count total in sales
     const total = sale.reduce((acc, cur) => {
@@ -209,7 +208,7 @@ route.get("/:startDate/:endDate/all", authenticateToken, async (req, res) => {
       .populate({
         path: "detail_sale",
         populate: { path: "product", select: "name" },
-        select: "quantity sub_total total production",
+        select: "quantity sub_total total ",
       });
     //count total in sales
     const total = sale.reduce((acc, cur) => {
@@ -315,7 +314,7 @@ route.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const sale = await Sale.findById(req.params.id);
 
-    // eliminar cada detail_sale de production y aumentar el stock
+    //  aumentar el stock
     if (sale.detail_sale.length > 0) {
       for (let i = 0; i < sale.detail_sale.length; i++) {
         const detailSale = await DetailSale.findById(sale.detail_sale[i]);
@@ -323,17 +322,9 @@ route.delete("/:id", authenticateToken, async (req, res) => {
         await Product.findByIdAndUpdate(product._id, {
           $inc: { stock: detailSale.quantity },
         });
-        await Production.findByIdAndUpdate(detailSale.production, {
-          $pull: { detail_sales: detailSale._id },
-        });
       }
     }
-    //eliminar cada detail_sale
-    /*if (sale.detail_sale.length > 0) {
-      for (let i = 0; i < sale.detail_sale.length; i++) {
-        await DetailSale.findByIdAndDelete(sale.detail_sale[i]);
-      }
-    }*/
+    
 
     // Verifica si existe detalle de venta para eliminar la venta o solo ponerle status false
     if (sale.detail_sale.length > 0) {

@@ -12,21 +12,6 @@ route.get("/", authenticateToken, async (req, res) => {
     .sort({ _id: 1 })
     .populate("place", { description: 1, _id: 0 })
     .populate("product", { name: 1, _id: 1 })
-    .populate("detail_sales", { date: 1, status: 1, description: 1, total: 1 })
-    .populate("production_costs", {
-      description: 1,
-      date: 1,
-      quantity: 1,
-      total: 1,
-      unit_price: 1,
-      status: 1,
-    })
-    .populate("salaries", {
-      employee: 1,
-      date: 1,
-      total: 1,
-      _id: 0,
-    })
     .populate("harvest", { quantity: 1, date: 1, description: 1 });
   return res.status(200).json(productions);
 });
@@ -37,21 +22,6 @@ route.get("/all", authenticateToken, async (req, res) => {
     .sort({ _id: 1 })
     .populate("place", { description: 1, _id: 0 })
     .populate("product", { name: 1, _id: 1 })
-    .populate("detail_sales", { date: 1, status: 1, description: 1, total: 1 })
-    .populate("production_costs", {
-      description: 1,
-      date: 1,
-      quantity: 1,
-      total: 1,
-      unit_price: 1,
-      status: 1,
-    })
-    .populate("salaries", {
-      employee: 1,
-      date: 1,
-      total: 1,
-      _id: 0,
-    })
     .populate("harvest", { quantity: 1, date: 1, description: 1 });
   return res.status(200).json(productions);
 });
@@ -67,22 +37,8 @@ route.get("/start/:startDate/:endDate", authenticateToken, async (req, res) => {
     })
       .sort({ _id: 1 })
       .populate("place", { description: 1, _id: 0 })
-      .populate("product", { name: 1, _id: 0 })
-      .populate("detail_sales", { _id: 1, quantity: 1, sub_total: 1, total: 1 })
-      .populate("salaries", {
-        employee: 1,
-        date: 1,
-        amount: 1,
-        _id: 0,
-      })
-      .populate("production_costs", {
-        description: 1,
-        date: 1,
-        quantity: 1,
-        total: 1,
-        unit_price: 1,
-        status: 1,
-      });
+      .populate("product", { name: 1, _id: 0 });
+
     return res.status(200).json(productions);
   } catch (error) {
     return res.status(500).json({
@@ -104,22 +60,8 @@ route.get("/end/:startDate/:endDate", authenticateToken, async (req, res) => {
     })
       .sort({ _id: 1 })
       .populate("place", { description: 1, _id: 0 })
-      .populate("product", { name: 1, _id: 0 })
-      .populate("detail_sales", { _id: 1, quantity: 1, sub_total: 1, total: 1 })
-      .populate("salaries", {
-        employee: 1,
-        date: 1,
-        total: 1,
-        _id: 0,
-      })
-      .populate("production_costs", {
-        description: 1,
-        date: 1,
-        quantity: 1,
-        total: 1,
-        unit_price: 1,
-        status: 1,
-      });
+      .populate("product", { name: 1, _id: 0 });
+
     return res.status(200).json(productions);
   } catch (error) {
     return res.status(500).json({
@@ -173,12 +115,8 @@ route.put(
     const { end_date } = req.body;
     //buscar la produccion
     const production = await Production.findById(req.params.id)
-      //.populate("extra_moves")
-      .populate("production_costs")
       .populate("product")
-      .populate("place")
-      .populate("detail_sales")
-      .populate("salaries");
+      .populate("place");
 
     //validar que exista la produccion
     if (!production) {
@@ -202,31 +140,6 @@ route.put(
         message: "La fecha de fin debe ser mayor a la fecha de inicio",
       });
     }
-    // calcular el total de todos los costos
-
-    let total_costs = 0;
-    production.production_costs.forEach((cost) => {
-      total_costs += cost.total;
-    });
-    production.salaries.forEach((salary) => {
-      total_costs += salary.total;
-    });
-    production.extra_moves.forEach((move) => {
-      if (move.type === "egress") {
-        total_costs += move.total;
-      }
-    });
-
-    //calcular el total de ingresos
-    let total_detail_sales = 0;
-    production.detail_sales.forEach((detail_sale) => {
-      total_detail_sales += detail_sale.total;
-    });
-    production.extra_moves.forEach((move) => {
-      if (move.type === "ingress") {
-        total_detail_sales += move.total;
-      }
-    });
 
     // buscar la produccion y actualizarla
     let response = await Production.findByIdAndUpdate(
@@ -234,8 +147,6 @@ route.put(
       {
         end_date: end_date,
         in_progress: false,
-        total_egress: total_costs,
-        total_ingress: total_detail_sales,
       },
       { new: true }
     );
@@ -253,8 +164,6 @@ route.put("/:id/inProgress", authenticateToken, async (req, res) => {
       {
         in_progress: true,
         end_date: null,
-        total_egress: 0,
-        total_ingress: 0,
       },
       { new: true }
     );
@@ -275,30 +184,7 @@ route.delete("/:id", authenticateToken, async (req, res) => {
       message: "La produccion no existe",
     });
   }
-  if (production.detail_sales.length > 0) {
-    return res.status(400).json({
-      name: "Produccion",
-      message: "La produccion no puede ser eliminada porque tiene ventas",
-    });
-  }
-  if (production.production_costs.length > 0) {
-    return res.status(400).json({
-      name: "Produccion",
-      message: "La produccion no puede ser eliminada porque tiene costos",
-    });
-  }
-  if (production.extra_moves.length > 0) {
-    return res.status(400).json({
-      name: "Produccion",
-      message: "La produccion no puede ser eliminada porque tiene movimientos",
-    });
-  }
-  if (production.salaries.length > 0) {
-    return res.status(400).json({
-      name: "Produccion",
-      message: "La produccion no puede ser eliminada porque tiene salarios",
-    });
-  }
+
   if (production.harvest.length > 0) {
     return res.status(400).json({
       name: "Produccion",

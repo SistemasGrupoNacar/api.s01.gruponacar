@@ -26,30 +26,7 @@ const production = new mongoose.Schema(
       ref: "Product",
       required: true,
     },
-    detail_sales: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "DetailSale",
-      },
-    ],
-    production_costs: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "ProductionCost",
-      },
-    ],
-    salaries: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Salary",
-      },
-    ],
-    extra_moves: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "ExtraMove",
-      },
-    ],
+
     harvest: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -95,17 +72,6 @@ production.methods.toJSON = function () {
       hour12: true,
     });
   }
-
-  // Convertir el total a dolar
-  obj.total_ingress_format = obj.total_ingress.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-  });
-  // Convertir el total a dolar
-  obj.total_egress_format = obj.total_egress.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-  });
 
   return obj;
 };

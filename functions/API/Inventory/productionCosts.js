@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const { body, query, param, validationResult } = require("express-validator");
 const { errors } = require("../../middleware/errors");
 const ProductionCost = require("../../db/Models/Inventory/ProductionCost");
-const Production = require("../../db/Models/Inventory/Production");
 
 let { authenticateToken } = require("../../middleware/auth");
 
@@ -13,7 +12,6 @@ route.get("/", authenticateToken, async (req, res) => {
     let productionCost = await ProductionCost.find()
       .sort({ _id: 1 })
       .populate("inventory_product", { name: 1 })
-      .populate("production", { _id: 1 });
     return res.status(200).json(productionCost);
   } catch (err) {
     return res.status(500).json({
@@ -39,7 +37,6 @@ route.get(
       })
         .sort({ _id: 1 })
         .populate("inventory_product", { name: 1 })
-        .populate("production", { _id: 1 });
       //count total productionCost
       let totalProductionCost = await ProductionCost.aggregate([
         {
@@ -76,9 +73,6 @@ route.get(
 route.post(
   "/",
   authenticateToken,
-  body("production")
-    .notEmpty()
-    .withMessage("La produccion no debe estar vacia"),
   body("inventory_product")
     .notEmpty()
     .withMessage("El producto no debe estar vacio"),
@@ -93,7 +87,7 @@ route.post(
       return res.status(422).json({ errors: errors.array() });
     }
     // Obtiene los datos del post
-    const { production, inventory_product, quantity, description, date } =
+    const {  inventory_product, quantity, description, date } =
       req.body;
 
     try {
@@ -120,7 +114,7 @@ route.post(
       const total = quantity * unit_price;
       // Crea el modelo de costo de produccion
       let productionCost = new ProductionCost({
-        production,
+        
         inventory_product,
         description,
         quantity,
@@ -129,11 +123,7 @@ route.post(
         total,
       });
       let response = await productionCost.save();
-      await Production.findByIdAndUpdate(
-        production,
-        { $push: { production_costs: response._id } },
-        { new: true }
-      );
+      
       //actualizar stock de inventoryProduct
       await InventoryProduct.findByIdAndUpdate(inventory_product, {
         $inc: {
@@ -153,12 +143,7 @@ route.post(
 route.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const response = await ProductionCost.findByIdAndDelete(req.params.id);
-    const production = await Production.findById(response.production);
-    await Production.findByIdAndUpdate(
-      production,
-      { $pull: { production_costs: response._id } },
-      { new: true }
-    );
+    
     //actualizar stock de inventoryProduct
     await InventoryProduct.findByIdAndUpdate(response.inventory_product, {
       $inc: {

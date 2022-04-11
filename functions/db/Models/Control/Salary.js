@@ -15,11 +15,6 @@ const salary = new mongoose.Schema(
       ref: "Employee",
       required: true,
     },
-    production: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Production",
-      default: null,
-    },
     date: {
       type: Date,
       required: true,

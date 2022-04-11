@@ -2,11 +2,6 @@ const mongoose = require("mongoose");
 
 const productionCost = new mongoose.Schema(
   {
-    production: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Production",
-      required: true,
-    },
     inventory_product: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "InventoryProduct",
@@ -46,7 +41,6 @@ productionCost.methods.toJSON = function () {
     currency: "USD",
   });
 
-  
   // Convertir fecha a local
   obj.date_format = new Date(obj.date).toLocaleString("es-ES", {
     timeZone: "America/El_Salvador",
