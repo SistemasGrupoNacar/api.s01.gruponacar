@@ -17,12 +17,12 @@ route.get("/", authenticateToken, async (req, res) => {
       harvest = await Harvest.find({})
         .limit(limit)
         .sort({ date: -1 })
-        .populate("product", { _id: 1, name: 1 })
+        .populate("product", { _id: 1, name: 1, unit_of_measurement: 1 })
         .populate("production", { _id: 1 });
     } else {
       harvest = await Harvest.find({})
         .sort({ date: -1 })
-        .populate("product", { _id: 1, name: 1 })
+        .populate("product", { _id: 1, name: 1, unit_of_measurement: 1 })
         .populate("production", { _id: 1 });
     }
 
@@ -45,7 +45,7 @@ route.get("/:startDate/:endDate", authenticateToken, async (req, res) => {
       },
     })
       .sort({ _id: 1 })
-      .populate("product", { _id: 1, name: 1 })
+      .populate("product", { _id: 1, name: 1, unit_of_measurement: 1 })
       .populate("production", { _id: 1 });
     //couunt the number of quantity in harvest
     const count = await Harvest.aggregate([
