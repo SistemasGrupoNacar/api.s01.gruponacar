@@ -11,7 +11,7 @@ route.get("/", authenticateToken, async (req, res) => {
   try {
     let productionCost = await ProductionCost.find()
       .sort({ _id: 1 })
-      .populate("inventory_product", { name: 1 });
+      .populate("inventory_product", { name: 1, unit_of_measurement: 1 });
     return res.status(200).json(productionCost);
   } catch (err) {
     return res.status(500).json({
@@ -27,7 +27,7 @@ route.get("/last", authenticateToken, async (req, res) => {
     let productionCost = await ProductionCost.find()
       .sort({ date: -1 })
       .limit(5)
-      .populate("inventory_product", { name: 1 });
+      .populate("inventory_product", { name: 1, unit_of_measurement: 1 });
     return res.status(200).json(productionCost);
   } catch (err) {
     return res.status(500).json({
@@ -52,7 +52,7 @@ route.get(
         },
       })
         .sort({ _id: 1 })
-        .populate("inventory_product", { name: 1 });
+        .populate("inventory_product", { name: 1, unit_of_measurement: 1 });
       //count total productionCost
       let totalProductionCost = await ProductionCost.aggregate([
         {
