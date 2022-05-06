@@ -213,9 +213,9 @@ router.delete("/:id", authenticateToken, async (req, res) => {
 
     // Verifica si el empleado tiene jornadas
     if (employee.journeys.length > 0) {
-      employee.is_active = false;
-      const response = await employee.save();
-      return res.status(200).json(response);
+      return res.status(400).json({
+        message: "El empleado tiene jornadas asociadas",
+      });
     } else {
       //Elimina el usuario
       const user = await User.findById(employee.user);

@@ -54,9 +54,8 @@ employee.methods.toJSON = function () {
   delete obj.__v;
   delete obj.createdAt;
   delete obj.updatedAt;
-  if (obj.is_active) {
-    obj.is_active_format = obj.is_active ? "Activo" : "Inactivo";
-  }
+  obj.is_active_format = obj.is_active ? "Activo" : "Inactivo";
+
   return obj;
 };
 
