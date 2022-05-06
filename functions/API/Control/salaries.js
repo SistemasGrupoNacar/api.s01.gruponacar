@@ -83,6 +83,8 @@ router.get("/total/:employee", authenticateToken, async (req, res) => {
     return res.status(200).json({
       employee: employeeName,
       total: total,
+      payments: salaries.length,
+
     });
   } catch (error) {
     return res.status(500).json({

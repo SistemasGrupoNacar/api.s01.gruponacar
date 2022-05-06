@@ -19,7 +19,7 @@ const {
 } = require("../../scripts/statistics");
 const val = mongoose.Types.ObjectId("61dc6d180dea196d5fdf0bf4");
 
-route.get("/", authenticateToken, async (req, res) => {
+route.get("/", async (req, res) => {
   try {
     let inventoryEntries, salaries;
     const filteredQuery = req.query.startDate ? true : false;

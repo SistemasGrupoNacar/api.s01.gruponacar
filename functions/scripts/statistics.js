@@ -126,7 +126,11 @@ const getDataCurrentMonthIngress = (sales, extra) => {
   const { total, total_format } = totalFunction(data);
 
   // Calcular el porcentaje del total que corresponde a movimientos extra redondeado a dos decimales
-  const percentage = (totalExtra.total / total) * 100;
+  let percentage = 0;
+  if (totalExtra.total > 0) {
+    percentage = (totalExtra.total / total) * 100;
+  }
+
   const percentage_format = percentage.toFixed(2);
 
   return {
@@ -146,7 +150,11 @@ const getDataRangeIngress = (sales, extra) => {
   // Calcular total del mes
   const { total, total_format } = totalFunction(joined);
   // Calcular el porcentaje del total que corresponde a movimientos extra redondeado a dos decimales
-  const percentage = (totalExtra.total / total) * 100;
+  let percentage = 0;
+  if (totalExtra.total > 0) {
+    percentage = (totalExtra.total / total) * 100;
+  }
+
   const percentage_format = percentage.toFixed(2);
   joined = formatData(joined);
   return {
@@ -166,7 +174,11 @@ const getDataRangeEgress = (inventoryEntries, salaries, extra) => {
   // Calcular total del mes
   const { total, total_format } = totalFunction(joined);
   // Calcular el porcentaje del total que corresponde a movimientos extra redondeado a dos decimales
-  const percentage = (totalExtra.total / total) * 100;
+  let percentage = 0;
+  if (totalExtra.total > 0) {
+    percentage = (totalExtra.total / total) * 100;
+  }
+
   const percentage_format = percentage.toFixed(2);
   joined = formatData(joined);
   return {
@@ -204,7 +216,10 @@ const getDataCurrentMonthEgress = (egress, salaries, extra) => {
   // Calcular total del mes
   const { total, total_format } = totalFunction(data);
   // Calcular el porcentaje del total que corresponde a movimientos extra redondeado a dos decimales
-  const percentage = (totalExtra.total / total) * 100;
+  let percentage = 0;
+  if (totalExtra.total > 0) {
+    percentage = (totalExtra.total / total) * 100;
+  }
   const percentage_format = percentage.toFixed(2);
 
   return {

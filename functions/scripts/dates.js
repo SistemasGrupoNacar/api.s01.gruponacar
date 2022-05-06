@@ -3,13 +3,25 @@ const checkDates = (startDateI, endDateI, data) => {
   if (typeof startDateI === "undefined" || typeof endDateI === "undefined") {
     const { startDate, endDate } = getDates(data);
     const filtered = false;
-    const { startDateFormat, endDateFormat } = formatDates(startDate, endDate);
+    // Struct date in 'year-month-day' format
+    let startDateStruct = structDate(startDate, "year-month-day");
+    let endDateStruct = structDate(endDate, "year-month-day");
+    const { startDateFormat, endDateFormat } = formatDates(
+      startDateStruct,
+      endDateStruct
+    );
     return { startDate, endDate, startDateFormat, endDateFormat, filtered };
   } else {
     const startDate = startDateI;
     const endDate = endDateI;
     const filtered = true;
-    const { startDateFormat, endDateFormat } = formatDates(startDate, endDate);
+    // Struct date in 'day-month-year' format
+    let startDateStruct = structDate(startDate, "day-month-year");
+    let endDateStruct = structDate(endDate, "day-month-year");
+    const { startDateFormat, endDateFormat } = formatDates(
+      startDateStruct,
+      endDateStruct
+    );
     return { startDate, endDate, startDateFormat, endDateFormat, filtered };
   }
 };
@@ -33,6 +45,20 @@ const formatDates = (startDate, endDate) => {
     );
     const endDateFormat = new Date(endDate).toLocaleString("es-ES", options);
     return { startDateFormat, endDateFormat };
+  }
+};
+
+// Desestructura la fecha intercambiando el mes con el dia y la ordena para que la funcion Date la entienda
+const structDate = (date, options) => {
+  if (options == "day-month-year") {
+    const dateStructure = date.split("-");
+    return dateStructure[1] + "/" + dateStructure[0] + "/" + dateStructure[2];
+  } else if (options == "month-day-year") {
+    const dateStructure = date.split("-");
+    return dateStructure[0] + "/" + dateStructure[1] + "/" + dateStructure[2];
+  } else if (options == "year-month-day") {
+    const dateStructure = date.split("-");
+    return dateStructure[1] + "/" + dateStructure[2] + "/" + dateStructure[0];
   }
 };
 
