@@ -247,19 +247,21 @@ const totalFunction = (data) => {
 const maxAndMin = (data) => {
   let max = {};
   let min = {};
-  data.forEach((element) => {
-    if (!max.total || max.total < element.total) {
-      max = element;
-    }
-    if (!min.total || min.total > element.total) {
-      min = element;
-    }
-  });
-  // Formatear el id de fecha a local
+  if (data.length > 0) {
+    data.forEach((element) => {
+      if (!max.total || max.total < element.total) {
+        max = element;
+      }
+      if (!min.total || min.total > element.total) {
+        min = element;
+      }
+    });
+    // Formatear el id de fecha a local
 
-  var options = { year: "numeric", month: "long", day: "numeric" };
-  max._id = new Date(max._id).toLocaleDateString("es-ES", options);
-  min._id = new Date(min._id).toLocaleDateString("es-ES", options);
+    var options = { year: "numeric", month: "long", day: "numeric" };
+    max._id = new Date(max._id).toLocaleDateString("es-ES", options);
+    min._id = new Date(min._id).toLocaleDateString("es-ES", options);
+  }
   return { max, min };
 };
 

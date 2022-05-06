@@ -1,5 +1,14 @@
 // Verificar si existen fechas de filtro o no
 const checkDates = (startDateI, endDateI, data) => {
+  if (data.length == 0) {
+    return {
+      startDate: startDateI,
+      endDate: endDateI,
+      startDateFormat: "",
+      endDateFormat: "",
+      filtered: false,
+    };
+  }
   if (typeof startDateI === "undefined" || typeof endDateI === "undefined") {
     const { startDate, endDate } = getDates(data);
     const filtered = false;

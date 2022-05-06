@@ -181,7 +181,6 @@ route.get("/", async (req, res) => {
     const inventoryEntriesGraphic = graphic(inventoryEntries);
     const salariesGraphic = graphic(salaries);
     const extraMovesGraphic = graphic(extraMoves);
-
     // Verificar que son arrays
     if (!Array.isArray(inventoryEntries)) {
       const pivot = sales;
@@ -233,11 +232,11 @@ route.get("/", async (req, res) => {
     const statisticsThreeMonths = getDataLastThreeMonths(
       inventoryEntries.concat(extraMoves.concat(salaries))
     );
-
     // Obtener maximos y minimos
     const maxAndMinInventoryEntries = maxAndMin(inventoryEntries);
     const maxAndMinExtraMoves = maxAndMin(extraMoves);
     const maxAndMinSalaries = maxAndMin(salaries);
+    console.log(maxAndMinInventoryEntries);
     // Obtiene el porcentaje de incremento o decremento
     const percentageIncDec = verifyDataForPercentage(statisticsThreeMonths);
     const response = {
