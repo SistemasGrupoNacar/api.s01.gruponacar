@@ -24,38 +24,22 @@ route.get("/", authenticateToken, async (req, res) => {
 // Obtiene las graficas de los 5 productos mas consumidos
 route.get("/graphic", authenticateToken, async (req, res) => {
   try {
+    let productionCostRegisters = [];
     // Obtiene el listado de los productos mas usados en estos ultimos 5 dias
-    const productionCostLastFiveDays = await ProductionCost.aggregate([
-      {
-        $match: {
-          date: {
-            $gte: new Date(new Date().setDate(new Date().getDate() - 5)),
-            $lte: new Date(),
-          },
-        },
-      },
-      {
-        $group: {
-          _id: "$inventory_product",
-          quantity: { $sum: "$quantity" },
-        },
-      },
-      {
-        $sort: {
-          quantity: -1,
-        },
-      },
-      {
-        $limit: 5,
-      },
-    ]);
+    const lastProductsFromProductionCost =
+      await getLastProductsFromProductionCost();
 
     // Obtener el listado de registros por cada producto
-    const result = await createGraphic(productionCostLastFiveDays);
-    console.log(result);
-    return res.status(200).json({
-      graphic: result,
-    });
+    for (let i = 0; i < lastProductsFromProductionCost.length; i++) {
+      // Obtiene los ultimos movimientos de cada producto
+      const lastMovementsOfProduct = await getLastMovementsOfProduct(
+        lastProductsFromProductionCost[i]._id
+      );
+      // Agrega el registro al listado
+      productionCostRegisters.push(lastMovementsOfProduct);
+    }
+    // Retorna el listado para la grafica
+    return res.status(200).json(productionCostRegisters);
   } catch (err) {
     return res.status(500).json({
       name: err.name,
@@ -216,25 +200,6 @@ const createGraphic = (productionCostLastFiveDays) => {
   return new Promise((resolve, reject) => {
     let arrayAAA = [];
     productionCostLastFiveDays.forEach(async (product) => {
-      const registersPerDay = await ProductionCost.aggregate([
-        {
-          $match: {
-            inventory_product: product._id,
-          },
-        },
-        {
-          $group: {
-            _id: {
-              $dateToString: {
-                format: "%Y-%m-%d",
-                date: "$date",
-                timezone: "America/El_Salvador",
-              },
-            },
-            total: { $sum: "$quantity" },
-          },
-        },
-      ]);
       const productWithRegisters = {
         name: product._id,
         data: graphicProductionCosts(registersPerDay),
@@ -242,6 +207,66 @@ const createGraphic = (productionCostLastFiveDays) => {
     });
     resolve(arrayAAA);
   });
+};
+
+const getLastProductsFromProductionCost = async () => {
+  // Obtiene el listado de los productos mas usados en estos ultimos 5 dias
+  return await ProductionCost.aggregate([
+    {
+      $match: {
+        date: {
+          $gte: new Date(new Date().setDate(new Date().getDate() - 5)),
+          $lte: new Date(),
+        },
+      },
+    },
+    {
+      $group: {
+        _id: "$inventory_product",
+        quantity: { $sum: "$quantity" },
+      },
+    },
+    {
+      $sort: {
+        quantity: -1,
+      },
+    },
+    {
+      $limit: 5,
+    },
+  ]);
+};
+
+const getLastMovementsOfProduct = async (productId) => {
+  const registers = await ProductionCost.aggregate([
+    {
+      $match: {
+        inventory_product: productId,
+      },
+    },
+    {
+      $group: {
+        _id: {
+          $dateToString: {
+            format: "%Y-%m-%d",
+            date: "$date",
+            timezone: "America/El_Salvador",
+          },
+        },
+        total: { $sum: "$quantity" },
+      },
+    },
+  ]);
+  const inventoryProductName = await getInventoryProductName(productId);
+  return {
+    name: inventoryProductName,
+    data: graphicProductionCosts(registers),
+  };
+};
+
+const getInventoryProductName = async (productId) => {
+  const inventoryProduct = await InventoryProduct.findById(productId);
+  return inventoryProduct.name || "";
 };
 //Crea la grafica para los 5 dias
 const graphicProductionCosts = (data) => {
