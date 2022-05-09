@@ -4,6 +4,7 @@ const route = express.Router();
 const InventoryEntry = require("../../db/Models/Inventory/InventoryEntry");
 const Sales = require("../../db/Models/Inventory/Sale");
 const Salary = require("../../db/Models/Control/Salary");
+const TypeMove = require("../../db/Models/General/TypeMove");
 const { body } = require("express-validator");
 const { graphic } = require("../../scripts/graphic");
 const { checkDates } = require("../../scripts/dates");
@@ -20,6 +21,11 @@ const {
 const val = mongoose.Types.ObjectId("61dc6d180dea196d5fdf0bf4");
 
 route.get("/", async (req, res) => {
+  // Obtener el id de movimiento egreso
+  const {_id} = await TypeMove.findOne({
+    title: "egress",
+  })
+
   try {
     let inventoryEntries, salaries;
     const filteredQuery = req.query.startDate ? true : false;
@@ -85,7 +91,7 @@ route.get("/", async (req, res) => {
               $gte: new Date(req.query.startDate),
               $lte: new Date(req.query.endDate),
             },
-            type_move: val,
+            type_move: _id,
           },
         },
         {
@@ -145,7 +151,7 @@ route.get("/", async (req, res) => {
       extraMoves = await ExtraMove.aggregate([
         {
           $match: {
-            type_move: val,
+            type_move: _id,
           },
         },
         {

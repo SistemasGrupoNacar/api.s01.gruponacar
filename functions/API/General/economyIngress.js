@@ -14,9 +14,11 @@ const {
 } = require("../../scripts/statistics");
 let { authenticateToken } = require("../../middleware/auth");
 const ExtraMove = require("../../db/Models/General/ExtraMove");
-// Se declara el valor del tipo de movimiento para ingresos
-var val = mongoose.Types.ObjectId("61dc6d250dea196d5fdf0bf7");
 route.get("/", authenticateToken, async (req, res) => {
+  // Obtener el id de movimiento egreso
+  const { _id } = await TypeMove.findOne({
+    title: "ingress",
+  });
   try {
     let sales;
     let extraMoves;
@@ -58,7 +60,7 @@ route.get("/", authenticateToken, async (req, res) => {
               $gte: new Date(req.query.startDate),
               $lte: new Date(req.query.endDate),
             },
-            type_move: val,
+            type_move: _id,
           },
         },
         {
@@ -106,7 +108,7 @@ route.get("/", authenticateToken, async (req, res) => {
       extraMoves = await ExtraMove.aggregate([
         {
           $match: {
-            type_move: val,
+            type_move: _id,
           },
         },
         {
