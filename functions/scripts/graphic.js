@@ -10,4 +10,5 @@ function graphic(data) {
   });
   return graphic;
 }
+
 module.exports = { graphic };

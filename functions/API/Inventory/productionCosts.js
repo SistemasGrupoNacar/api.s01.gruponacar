@@ -2,10 +2,10 @@ const express = require("express");
 const route = express.Router();
 const mongoose = require("mongoose");
 const { body, query, param, validationResult } = require("express-validator");
-const { errors } = require("../../middleware/errors");
 const ProductionCost = require("../../db/Models/Inventory/ProductionCost");
 
 let { authenticateToken } = require("../../middleware/auth");
+const InventoryProduct = require("../../db/Models/Inventory/InventoryProduct");
 
 route.get("/", authenticateToken, async (req, res) => {
   try {
@@ -13,6 +13,49 @@ route.get("/", authenticateToken, async (req, res) => {
       .sort({ _id: 1 })
       .populate("inventory_product", { name: 1, unit_of_measurement: 1 });
     return res.status(200).json(productionCost);
+  } catch (err) {
+    return res.status(500).json({
+      name: err.name,
+      message: err.message,
+    });
+  }
+});
+
+// Obtiene las graficas de los 5 productos mas consumidos
+route.get("/graphic", authenticateToken, async (req, res) => {
+  try {
+    // Obtiene el listado de los productos mas usados en estos ultimos 5 dias
+    const productionCostLastFiveDays = await ProductionCost.aggregate([
+      {
+        $match: {
+          date: {
+            $gte: new Date(new Date().setDate(new Date().getDate() - 5)),
+            $lte: new Date(),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$inventory_product",
+          quantity: { $sum: "$quantity" },
+        },
+      },
+      {
+        $sort: {
+          quantity: -1,
+        },
+      },
+      {
+        $limit: 5,
+      },
+    ]);
+
+    // Obtener el listado de registros por cada producto
+    const result = await createGraphic(productionCostLastFiveDays);
+    console.log(result);
+    return res.status(200).json({
+      graphic: result,
+    });
   } catch (err) {
     return res.status(500).json({
       name: err.name,
@@ -167,5 +210,65 @@ route.delete("/:id", authenticateToken, async (req, res) => {
     });
   }
 });
+
+// Crea el listado de datos de cada producto
+const createGraphic = (productionCostLastFiveDays) => {
+  return new Promise((resolve, reject) => {
+    let arrayAAA = [];
+    productionCostLastFiveDays.forEach(async (product) => {
+      const registersPerDay = await ProductionCost.aggregate([
+        {
+          $match: {
+            inventory_product: product._id,
+          },
+        },
+        {
+          $group: {
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$date",
+                timezone: "America/El_Salvador",
+              },
+            },
+            total: { $sum: "$quantity" },
+          },
+        },
+      ]);
+      const productWithRegisters = {
+        name: product._id,
+        data: graphicProductionCosts(registersPerDay),
+      };
+    });
+    resolve(arrayAAA);
+  });
+};
+//Crea la grafica para los 5 dias
+const graphicProductionCosts = (data) => {
+  let graphic = {};
+  const today = new Date();
+
+  // Ordena los datos dia por dia
+  for (let i = 5; i > 0; i--) {
+    const pastDays = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
+    let day = pastDays.toISOString().split("T")[0];
+    let total = 0;
+    // Obtiene el total de costos de produccion por dia
+    data.forEach((element) => {
+      if (element._id == day) {
+        total += element.total;
+      }
+    });
+
+    // Formatear la fecha
+    day = pastDays.toLocaleString("es-SV", {
+      weekday: "long",
+    });
+
+    graphic[day] = total;
+  }
+
+  return graphic;
+};
 
 module.exports = route;
