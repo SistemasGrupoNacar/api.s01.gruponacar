@@ -195,20 +195,6 @@ route.delete("/:id", authenticateToken, async (req, res) => {
   }
 });
 
-// Crea el listado de datos de cada producto
-const createGraphic = (productionCostLastFiveDays) => {
-  return new Promise((resolve, reject) => {
-    let arrayAAA = [];
-    productionCostLastFiveDays.forEach(async (product) => {
-      const productWithRegisters = {
-        name: product._id,
-        data: graphicProductionCosts(registersPerDay),
-      };
-    });
-    resolve(arrayAAA);
-  });
-};
-
 const getLastProductsFromProductionCost = async () => {
   // Obtiene el listado de los productos mas usados en estos ultimos 5 dias
   return await ProductionCost.aggregate([
@@ -257,16 +243,28 @@ const getLastMovementsOfProduct = async (productId) => {
       },
     },
   ]);
-  const inventoryProductName = await getInventoryProductName(productId);
+  const inventoryProduct = await getInventoryProduct(productId);
+
   return {
-    name: inventoryProductName,
+    name: truncateAndFormat(
+      inventoryProduct.name,
+      inventoryProduct.unit_of_measurement
+    ),
     data: graphicProductionCosts(registers),
   };
 };
 
-const getInventoryProductName = async (productId) => {
+const truncateAndFormat = (input, unit) =>
+  input.length > 15
+    ? `${input.substring(0, 15)}...(${unit})`
+    : input + `(${unit})`;
+
+const getInventoryProduct = async (productId) => {
   const inventoryProduct = await InventoryProduct.findById(productId);
-  return inventoryProduct.name || "";
+  return {
+    name: inventoryProduct.name,
+    unit_of_measurement: inventoryProduct.unit_of_measurement,
+  };
 };
 //Crea la grafica para los 5 dias
 const graphicProductionCosts = (data) => {
