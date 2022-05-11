@@ -81,6 +81,8 @@ router.get("/last", authenticateToken, async (req, res) => {
   }
 });
 
+
+
 router.post(
   "/",
   body("firstName").notEmpty().withMessage("Nombres son requeridos"),
@@ -231,4 +233,5 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     });
   }
 });
+
 module.exports = router;

@@ -108,6 +108,60 @@ route.get("/employee/:id", authenticateToken, async (req, res) => {
     });
   }
 });
+// Muestra una grafica de los empleados que tienen mas jornadas laborales en el mes actual
+route.get("/graph", authenticateToken, async (req, res) => {
+  try {
+    const journeys = await Journey.aggregate([
+      {
+        $match: {
+          check_in: {
+            // Que sean solamente del mes actual
+            $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            $lte: new Date(
+              new Date().getFullYear(),
+              new Date().getMonth() + 1,
+              0
+            ),
+          },
+          check_out: {
+            $ne: null,
+          },
+        },
+      },
+      {
+        // Agrupar por id de empleado
+        $group: {
+          _id: "$employee",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+    // Obtener el nombre de cada empleado
+    for (let i = 0; i < journeys.length; i++) {
+      journeys[i].employee = await getEmployeeName(journeys[i]._id);
+    }
+
+    // Crea el diseño de datos que requiere el grafico
+    let jorneyDataForGraph = [];
+    journeys.forEach((element) => {
+      /** FORMATO QUE REQUIERE EL GRAFICO
+       *  [["Andrés Antonio García Monterroza",3],
+          ["Herberth Antonio Mendoza Carpintero", 3],
+          ["José Miguel Ayala Carrillo", 3],
+          ["Carlos Eduardo Navarrete Rodríguez",3]]
+       */
+      jorneyDataForGraph.push([element.employee, element.count]);
+    });
+
+    // retorna el resultado
+    return res.status(200).json(jorneyDataForGraph);
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
+});
 
 route.post(
   "/",
@@ -291,5 +345,11 @@ route.delete("/:id", authenticateToken, async (req, res) => {
     });
   }
 });
+
+// Obtener el nombre completo del empleado por el id
+const getEmployeeName = async (id) => {
+  const { first_name, last_name } = await Employee.findById(id);
+  return `${first_name} ${last_name}`;
+};
 
 module.exports = route;

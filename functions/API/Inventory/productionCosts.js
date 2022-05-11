@@ -22,7 +22,7 @@ route.get("/", authenticateToken, async (req, res) => {
 });
 
 // Obtiene las graficas de los 5 productos mas consumidos
-route.get("/graphic", authenticateToken, async (req, res) => {
+route.get("/graph", authenticateToken, async (req, res) => {
   try {
     let productionCostRegisters = [];
     // Obtiene el listado de los productos mas usados en estos ultimos 5 dias
