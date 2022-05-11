@@ -349,7 +349,7 @@ route.delete("/:id", authenticateToken, async (req, res) => {
 // Obtener el nombre completo del empleado por el id
 const getEmployeeName = async (id) => {
   const { first_name, last_name } = await Employee.findById(id);
-  return `${first_name} ${last_name}`;
+  return `${first_name.split(" ")[0]} ${last_name.split(" ")[0]}`;
 };
 
 module.exports = route;
