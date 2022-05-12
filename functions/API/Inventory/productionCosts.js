@@ -144,7 +144,7 @@ route.post(
         });
       }
       // Verifica si hay suficiente insumo
-      if (inventoryProduct.quantity < quantity) {
+      if (inventoryProduct.stock < quantity) {
         return res.status(400).json({
           name: "Insuficiente insumo",
           message: "No hay suficiente insumo",
